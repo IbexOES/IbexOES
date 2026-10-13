@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Student Payment Management Portal</title>
+    <title>IBEX OES Student Status & Payment Management Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -279,7 +279,7 @@
         <div id="login-screen">
             <h2><i class="fas fa-lock"></i> Portal Login</h2>
             <div class="form-group">
-                <label>Enter Security Code (51214)</label>
+                <label>Enter Security Code</label>
                 <input type="password" id="passcode-input" placeholder="Enter code..." />
             </div>
             <button onclick="handleLogin()">Access Dashboard</button>
@@ -289,7 +289,7 @@
         <!-- DASHBOARD SCREEN -->
         <div id="dashboard-screen">
             <header>
-                <h1><i class="fas fa-globe"></i> Global Student Management Portal</h1>
+                <h1><i class="fas fa-globe"></i>IBEX OES Student Status & Payment Management Portal</h1>
                 <button class="logout-btn" onclick="handleLogout()">Logout</button>
             </header>
 
@@ -308,51 +308,35 @@
                                 <input type="text" id="program" required placeholder="BS Computer Science">
                             </div>
                             <div class="form-group">
-                                <label>Preferred By</label>
+                                <label>Rreferred By</label>
                                 <input type="text" id="preferred_by" placeholder="Agent / Ref">
                             </div>
                             <div class="form-group">
                                 <label>Total Package Amount ($)</label>
-                                <input type="number" id="total_package" required placeholder="5000">
+                                <input type="number" id="total_package" required placeholder="2500">
                             </div>
                             <div class="form-group">
                                 <label>Initial Pay ($)</label>
-                                <input type="number" id="initial_pay" required placeholder="1000">
+                                <input type="number" id="initial_pay" required placeholder="500">
                             </div>
                             <div class="form-grid-2">
                                 <div class="form-group">
                                     <label>Acceptance 1</label>
-                                    <select id="acceptance_1">
-                                        <option value="Pending">Pending</option>
-                                        <option value="Done">Done</option>
-                                        <option value="N/A">N/A</option>
-                                    </select>
+                                   <input type="text" id="Acceptance 1" required placeholder="CMU">
                                 </div>
                                 <div class="form-group">
                                     <label>Acceptance 2</label>
-                                    <select id="acceptance_2">
-                                        <option value="Pending">Pending</option>
-                                        <option value="Done">Done</option>
-                                        <option value="N/A" selected>N/A</option>
-                                    </select>
+                                     <input type="text" id="Acceptance 2" required placeholder="Monroe">
                                 </div>
                             </div>
                             <div class="form-grid-2">
                                 <div class="form-group">
                                     <label>Bank Statement</label>
-                                    <select id="bank_statement">
-                                        <option value="Pending">Pending</option>
-                                        <option value="Done">Done</option>
-                                        <option value="N/A">N/A</option>
-                                    </select>
+                                   <input type="text" id="Bank Statement" required placeholder="Bankstatement Status">
                                 </div>
                                 <div class="form-group">
                                     <label>I-20</label>
-                                    <select id="i_20">
-                                        <option value="Pending">Pending</option>
-                                        <option value="Done">Done</option>
-                                        <option value="N/A">N/A</option>
-                                    </select>
+                                    <input type="text" id="I 20" required placeholder="i 20 Status">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -361,15 +345,15 @@
                             </div>
                             <div class="form-group">
                                 <label>Appointment</label>
-                                <select id="appointment">
-                                    <option value="Pending">Pending</option>
-                                    <option value="Done">Done</option>
-                                    <option value="N/A" selected>N/A</option>
-                                </select>
+                             <input type="text" id="Appointment" required placeholder="Appointment Status">
                             </div>
                             <div class="form-group">
-                                <label>3rd Install SEVIS ($)</label>
+                                <label>3rd Installment ($)</label>
                                 <input type="number" id="third_install_sevis" value="0" placeholder="0">
+                            </div>
+                            <div class="form-group">
+                                <label>SEVIS ($)</label>
+                               <input type="text" id="SEVIS" required placeholder="SEVIS Status">
                             </div>
                             <div class="form-group">
                                 <label>Remarks / Notes</label>
