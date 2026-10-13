@@ -1,383 +1,332 @@
-import os, zipfile, textwrap
-
-base = "/mnt/data/ibex-student-crm"
-os.makedirs(base, exist_ok=True)
-files = {
-"package.json": r'''{
-  "name": "ibex-student-crm",
-  "private": true,
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {"dev": "vite", "build": "vite build", "preview": "vite preview"},
-  "dependencies": {"@supabase/supabase-js": "^2.57.0", "lucide-react": "^0.468.0", "react": "^18.3.1", "react-dom": "^18.3.1"},
-  "devDependencies": {"@vitejs/plugin-react": "^4.3.4", "vite": "^6.0.5"}
-}''',
-"index.html": r'''<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#10213a" />
-    <title>Ibex Student CRM</title>
-  </head>
-  <body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body>
-</html>''',
-".env.example": r'''VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY''',
-"src/main.jsx": r'''import React, { useEffect, useMemo, useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import { createClient } from '@supabase/supabase-js';
-import { LogIn, LogOut, Plus, Search, Users, Wallet, Clock, CheckCircle2, Upload, ExternalLink, RefreshCw } from 'lucide-react';
-import './style.css';
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aqeel Haider — Portfolio</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1e3a8a; /* Deep Navy Blue */
+            --secondary: #2563eb; /* Royal Blue */
+            --accent: #d97706; /* Soft Gold */
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --transition: all 0.3s ease;
+        }
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
-const STATUSES = ['New Lead','Documents Pending','Application Submitted','Offer Received','Visa Process','Visa Approved','Visa Refused','Enrolled','On Hold','Closed'];
-const money = n => new Intl.NumberFormat('en-PK', { style:'currency', currency:'PKR', maximumFractionDigits:0 }).format(Number(n || 0));
-const blankStudent = { full_name:'', phone:'', email:'', country:'USA', university:'', program:'', status:'New Lead', total_fee:'', notes:'' };
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-function App() {
-  const [session, setSession] = useState(null);
-  const [authLoading, setAuthLoading] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [authError, setAuthError] = useState('');
-  const [students, setStudents] = useState([]);
-  const [payments, setPayments] = useState([]);
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('All statuses');
-  const [active, setActive] = useState(null);
-  const [studentForm, setStudentForm] = useState(blankStudent);
-  const [editingId, setEditingId] = useState(null);
-  const [showStudentForm, setShowStudentForm] = useState(false);
-  const [paymentForm, setPaymentForm] = useState({ amount:'', date:new Date().toISOString().slice(0,10), method:'Bank Transfer', reference:'', notes:'' });
-  const [receipt, setReceipt] = useState(null);
-  const [saving, setSaving] = useState(false);
-  const [notice, setNotice] = useState('');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
 
-  useEffect(() => {
-    if (!supabase) { setAuthLoading(false); return; }
-    supabase.auth.getSession().then(({data}) => { setSession(data.session); setAuthLoading(false); });
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-      setAuthLoading(false);
-    });
-    return () => listener.subscription.unsubscribe();
-  }, []);
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
 
-  useEffect(() => { if (session) loadData(); else { setStudents([]); setPayments([]); setActive(null); } }, [session]);
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
 
-  async function loadData() {
-    if (!supabase) return;
-    const [s, p] = await Promise.all([
-      supabase.from('students').select('*').order('created_at', { ascending:false }),
-      supabase.from('payments').select('*').order('payment_date', { ascending:false })
-    ]);
-    if (s.error || p.error) { setNotice(s.error?.message || p.error?.message); return; }
-    setStudents(s.data || []); setPayments(p.data || []);
-    if (active) setActive((s.data || []).find(x => x.id === active.id) || null);
-  }
+        /* Header / Hero Section */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #ffffff;
+            padding: 4rem 2rem;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.2);
+        }
 
-  async function signIn(e) {
-    e.preventDefault(); setAuthError('');
-    if (!supabase) { setAuthError('Add your Supabase URL and key in the .env file first.'); return; }
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setAuthError(error.message);
-  }
-  async function signOut() { await supabase.auth.signOut(); }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 auto 1.5rem auto;
+            border: 4px solid var(--accent);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
 
-  const filtered = useMemo(() => students.filter(s => {
-    const hay = `${s.full_name} ${s.phone || ''} ${s.email || ''} ${s.university || ''} ${s.program || ''}`.toLowerCase();
-    return hay.includes(search.toLowerCase()) && (statusFilter === 'All statuses' || s.status === statusFilter);
-  }), [students, search, statusFilter]);
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
 
-  const paidByStudent = id => payments.filter(p => p.student_id === id).reduce((sum,p) => sum + Number(p.amount || 0), 0);
-  const totalExpected = students.reduce((sum,s) => sum + Number(s.total_fee || 0), 0);
-  const totalPaid = payments.reduce((sum,p) => sum + Number(p.amount || 0), 0);
-  const totalPending = students.reduce((sum,s) => sum + Math.max(0, Number(s.total_fee || 0) - paidByStudent(s.id)), 0);
+        header p {
+            font-size: 1.15rem;
+            color: #e2e8f0;
+            max-width: 600px;
+            margin: 0 auto 1.5rem auto;
+            font-weight: 300;
+        }
 
-  function startAdd() { setEditingId(null); setStudentForm(blankStudent); setShowStudentForm(true); }
-  function startEdit(s) {
-    setEditingId(s.id);
-    setStudentForm({ full_name:s.full_name || '', phone:s.phone || '', email:s.email || '', country:s.country || 'USA', university:s.university || '', program:s.program || '', status:s.status || 'New Lead', total_fee:String(s.total_fee ?? ''), notes:s.notes || '' });
-    setShowStudentForm(true);
-  }
-  async function saveStudent(e) {
-    e.preventDefault(); setSaving(true); setNotice('');
-    const payload = { ...studentForm, total_fee:Number(studentForm.total_fee || 0), owner_id:session.user.id };
-    const result = editingId
-      ? await supabase.from('students').update(payload).eq('id', editingId).select().single()
-      : await supabase.from('students').insert(payload).select().single();
-    setSaving(false);
-    if (result.error) { setNotice(result.error.message); return; }
-    setShowStudentForm(false); setNotice(editingId ? 'Student updated.' : 'Student added.');
-    await loadData();
-    if (!editingId) setActive(result.data);
-    else if (active?.id === editingId) setActive(result.data);
-  }
-  async function deleteStudent(s) {
-    if (!confirm(`Delete ${s.full_name} and their payment records? This cannot be undone.`)) return;
-    const { error } = await supabase.from('students').delete().eq('id', s.id);
-    if (error) setNotice(error.message); else { setActive(null); setNotice('Student deleted.'); await loadData(); }
-  }
-  async function addPayment(e) {
-    e.preventDefault();
-    if (!active) return;
-    setSaving(true); setNotice('');
-    let receipt_path = null;
-    if (receipt) {
-      const safeName = receipt.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-      const path = `${session.user.id}/${active.id}/${Date.now()}-${safeName}`;
-      const uploaded = await supabase.storage.from('payment-receipts').upload(path, receipt, { upsert:false });
-      if (uploaded.error) { setSaving(false); setNotice(`Receipt upload failed: ${uploaded.error.message}`); return; }
-      receipt_path = uploaded.data.path;
-    }
-    const { error } = await supabase.from('payments').insert({
-      owner_id:session.user.id, student_id:active.id, amount:Number(paymentForm.amount),
-      payment_date:paymentForm.date, method:paymentForm.method, reference:paymentForm.reference,
-      notes:paymentForm.notes, receipt_path
-    });
-    setSaving(false);
-    if (error) { setNotice(error.message); return; }
-    setPaymentForm({ amount:'', date:new Date().toISOString().slice(0,10), method:'Bank Transfer', reference:'', notes:'' });
-    setReceipt(null); setNotice('Payment recorded.'); await loadData();
-  }
-  async function openReceipt(path) {
-    const { data, error } = await supabase.storage.from('payment-receipts').createSignedUrl(path, 60);
-    if (error) setNotice(error.message); else window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
-  }
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+        }
 
-  if (authLoading) return <div className="center"><div className="spinner"/>Checking session…</div>;
-  if (!supabase) return <div className="center"><div className="login-card"><div className="brand-mark">I</div><h1>Set up Ibex CRM</h1><p>Create a Supabase project, run the SQL in <b>supabase-setup.sql</b>, copy <b>.env.example</b> to <b>.env</b>, and add your project URL and publishable/anon key.</p><p className="muted">Setup instructions are in README.md. Never put a Supabase service-role key in this website.</p></div></div>;
-  if (!session) return <div className="login-shell"><form className="login-card" onSubmit={signIn}><div className="brand-mark">I</div><div className="eyebrow">IBEX OVERSEAS EDUCATION</div><h1>Student CRM</h1><p className="muted">Securely manage students, applications and payments.</p><label>Email address<input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@company.com"/></label><label>Password<input type="password" required value={password} onChange={e=>setPassword(e.target.value)} placeholder="Your password"/></label>{authError && <div className="error">{authError}</div>}<button className="primary full" type="submit"><LogIn size={17}/> Log in</button><p className="tiny">Create your first user in Supabase Authentication → Users. Public sign-up is intentionally not provided.</p></form></div>;
+        .social-links a {
+            background: rgba(255, 255, 255, 0.1);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #ffffff;
+            transition: var(--transition);
+        }
 
-  const activePayments = active ? payments.filter(p=>p.student_id===active.id) : [];
-  return <div className="app-shell">
-    <aside className="sidebar"><div className="brand"><div className="brand-mark small">I</div><div><b>IBEX</b><span>OVERSEAS CRM</span></div></div><div className="nav-label">WORKSPACE</div><div className="nav-item selected"><Users size={17}/> Students <span className="nav-count">{students.length}</span></div><div className="sidebar-bottom"><div className="user-dot">{(session.user.email || 'I')[0].toUpperCase()}</div><div className="user-info"><b>{session.user.email}</b><span>Signed in</span></div><button className="icon-button" title="Log out" onClick={signOut}><LogOut size={17}/></button></div></aside>
-    <main className="main">
-      <header className="topbar"><div><div className="eyebrow">STUDENT MANAGEMENT</div><h1>Student dashboard</h1></div><div className="top-actions"><button className="secondary" onClick={loadData}><RefreshCw size={16}/> Refresh</button><button className="primary" onClick={startAdd}><Plus size={17}/> Add student</button></div></header>
-      {notice && <div className="notice" role="status">{notice}<button onClick={()=>setNotice('')}>×</button></div>}
-      <section className="stats-grid">
-        <div className="stat-card"><div className="stat-icon blue"><Users size={19}/></div><span>Total students</span><strong>{students.length}</strong><small>All records in your workspace</small></div>
-        <div className="stat-card"><div className="stat-icon green"><Wallet size={19}/></div><span>Total collected</span><strong>{money(totalPaid)}</strong><small>Recorded payments</small></div>
-        <div className="stat-card"><div className="stat-icon amber"><Clock size={19}/></div><span>Pending payments</span><strong>{money(totalPending)}</strong><small>Expected fees minus recorded payments</small></div>
-        <div className="stat-card"><div className="stat-icon purple"><CheckCircle2 size={19}/></div><span>Expected fees</span><strong>{money(totalExpected)}</strong><small>Across all students</small></div>
-      </section>
-      <section className="workspace">
-        <div className="list-panel"><div className="panel-heading"><div><h2>Students</h2><p>Search and track every student</p></div><span className="pill">{filtered.length} records</span></div>
-          <div className="filters"><div className="searchbox"><Search size={16}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search name, phone, university…"/></div><select value={statusFilter} onChange={e=>setStatusFilter(e.target.value)}><option>All statuses</option>{STATUSES.map(s=><option key={s}>{s}</option>)}</select></div>
-          <div className="student-list">{filtered.map(s=>{const paid=paidByStudent(s.id), pending=Math.max(0,Number(s.total_fee||0)-paid);return <button className={`student-row ${active?.id===s.id?'active':''}`} key={s.id} onClick={()=>{setActive(s);setShowStudentForm(false);}}><div className="avatar">{(s.full_name||'?').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase()}</div><div className="student-summary"><b>{s.full_name}</b><span>{s.university || s.country || 'No university added'}</span><div className="row-meta"><span className="status-dot"/>{s.status}</div></div><div className="row-money"><b>{money(pending)}</b><span>pending</span></div></button>})}
-          {filtered.length===0 && <div className="empty"><Users size={26}/><b>No students found</b><span>Add a student or change your search.</span></div>}</div>
-        </div>
-        <div className="detail-panel">
-          {showStudentForm ? <form onSubmit={saveStudent} className="detail-content"><div className="panel-heading"><div><h2>{editingId?'Edit student':'Add a student'}</h2><p>Fields marked * are required</p></div><button type="button" className="icon-button" onClick={()=>setShowStudentForm(false)}>×</button></div><div className="form-grid">
-            <label className="wide">Full name *<input required value={studentForm.full_name} onChange={e=>setStudentForm({...studentForm,full_name:e.target.value})}/></label>
-            <label>Phone / WhatsApp<input value={studentForm.phone} onChange={e=>setStudentForm({...studentForm,phone:e.target.value})}/></label><label>Email<input type="email" value={studentForm.email} onChange={e=>setStudentForm({...studentForm,email:e.target.value})}/></label>
-            <label>Destination country<select value={studentForm.country} onChange={e=>setStudentForm({...studentForm,country:e.target.value})}><option>USA</option><option>China</option><option>Canada</option><option>UK</option><option>Australia</option><option>Other</option></select></label>
-            <label>Status<select value={studentForm.status} onChange={e=>setStudentForm({...studentForm,status:e.target.value})}>{STATUSES.map(s=><option key={s}>{s}</option>)}</select></label>
-            <label>University<input value={studentForm.university} onChange={e=>setStudentForm({...studentForm,university:e.target.value})}/></label><label>Program / degree<input value={studentForm.program} onChange={e=>setStudentForm({...studentForm,program:e.target.value})}/></label>
-            <label className="wide">Total agreed service fee (PKR)<input type="number" min="0" value={studentForm.total_fee} onChange={e=>setStudentForm({...studentForm,total_fee:e.target.value})}/></label>
-            <label className="wide">Notes<textarea rows="3" value={studentForm.notes} onChange={e=>setStudentForm({...studentForm,notes:e.target.value})} placeholder="Application updates, follow-up notes…"/></label>
-          </div><div className="form-actions"><button type="button" className="secondary" onClick={()=>setShowStudentForm(false)}>Cancel</button><button className="primary" disabled={saving}>{saving?'Saving…':'Save student'}</button></div></form>
-          : active ? <div className="detail-content"><div className="detail-top"><div className="avatar large">{(active.full_name||'?').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase()}</div><div className="detail-title"><h2>{active.full_name}</h2><span className="status-badge">{active.status}</span></div><button className="secondary compact" onClick={()=>startEdit(active)}>Edit</button><button className="icon-button danger" title="Delete student" onClick={()=>deleteStudent(active)}>×</button></div>
-            <div className="contact-lines">{active.phone&&<div><span>Phone</span><b>{active.phone}</b></div>}{active.email&&<div><span>Email</span><b>{active.email}</b></div>}{active.university&&<div><span>University</span><b>{active.university}</b></div>}{active.program&&<div><span>Program</span><b>{active.program}</b></div>}<div><span>Destination</span><b>{active.country||'—'}</b></div></div>
-            <div className="fee-summary"><div><span>Total fee</span><b>{money(active.total_fee)}</b></div><div><span>Paid</span><b className="green-text">{money(paidByStudent(active.id))}</b></div><div><span>Pending</span><b className="amber-text">{money(Math.max(0,Number(active.total_fee||0)-paidByStudent(active.id)))}</b></div></div>
-            {active.notes&&<div className="notes-box"><b>Notes</b><p>{active.notes}</p></div>}
-            <div className="section-heading"><div><h3>Payment history</h3><p>Record payments and attach receipts</p></div><span className="pill">{activePayments.length} entries</span></div>
-            <form className="payment-form" onSubmit={addPayment}><div className="form-grid"><label>Amount (PKR) *<input type="number" min="1" required value={paymentForm.amount} onChange={e=>setPaymentForm({...paymentForm,amount:e.target.value})}/></label><label>Payment date *<input type="date" required value={paymentForm.date} onChange={e=>setPaymentForm({...paymentForm,date:e.target.value})}/></label><label>Method<select value={paymentForm.method} onChange={e=>setPaymentForm({...paymentForm,method:e.target.value})}><option>Bank Transfer</option><option>Cash</option><option>JazzCash</option><option>EasyPaisa</option><option>Wise</option><option>Other</option></select></label><label>Transaction ID / reference<input value={paymentForm.reference} onChange={e=>setPaymentForm({...paymentForm,reference:e.target.value})}/></label><label className="wide">Receipt screenshot (PNG, JPG or PDF)<input type="file" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>setReceipt(e.target.files?.[0] || null)}/>{receipt&&<span className="file-picked">{receipt.name}</span>}</label><label className="wide">Payment notes<input value={paymentForm.notes} onChange={e=>setPaymentForm({...paymentForm,notes:e.target.value})} placeholder="e.g. first installment"/></label></div><button className="primary full" disabled={saving}><Plus size={16}/>{saving?'Saving payment…':'Record payment'}</button></form>
-            <div className="payment-list">{activePayments.map(p=><div className="payment-row" key={p.id}><div className="payment-check"><CheckCircle2 size={18}/></div><div className="payment-info"><b>{money(p.amount)}</b><span>{p.payment_date} · {p.method}{p.reference?` · Ref: ${p.reference}`:''}</span>{p.notes&&<small>{p.notes}</small>}</div>{p.receipt_path&&<button className="receipt-link" onClick={()=>openReceipt(p.receipt_path)} title="Open private receipt"><ExternalLink size={16}/> Receipt</button>}</div>)}{activePayments.length===0&&<div className="empty small-empty">No payments recorded for this student yet.</div>}</div>
-          </div> : <div className="empty detail-empty"><div className="empty-art"><Users size={28}/></div><h2>Select a student</h2><p>Choose a student from the list to see their details, fees and payment history, or add a new student.</p><button className="primary" onClick={startAdd}><Plus size={17}/> Add student</button></div>}
-        </div>
-      </section>
-      <footer>Ibex Overseas Education · Private student records · Keep account access restricted to authorized staff</footer>
-    </main>
-  </div>;
-}
-createRoot(document.getElementById('root')).render(<App />);
-''',
-"src/style.css": r'''@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
-:root{font-family:'DM Sans',sans-serif;color:#182338;background:#f5f7fb;font-synthesis:none;text-rendering:optimizeLegibility}*{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit}button{cursor:pointer}.app-shell{min-height:100vh;display:flex}.sidebar{width:238px;background:#10213a;color:#d6dfed;padding:25px 16px;display:flex;flex-direction:column;flex-shrink:0}.brand{display:flex;gap:11px;align-items:center;padding:0 8px 35px}.brand-mark{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,#d8ad58,#f5d88f);color:#10213a;font:800 28px Manrope;display:grid;place-items:center;box-shadow:0 8px 22px #0002}.brand-mark.small{width:38px;height:38px;font-size:22px;border-radius:12px}.brand b{display:block;color:#fff;font:800 19px Manrope;letter-spacing:2px}.brand span{display:block;font-size:9px;letter-spacing:1.7px;color:#a9b8cd;margin-top:3px}.nav-label,.eyebrow{font-size:10px;font-weight:700;letter-spacing:1.5px;color:#8c9bb1}.nav-label{padding:0 12px 12px}.nav-item{padding:12px;border-radius:10px;display:flex;align-items:center;gap:10px;color:#fff;background:#ffffff12;font-weight:600;font-size:13px}.nav-count{margin-left:auto;font-size:11px;color:#cbd7e8}.sidebar-bottom{margin-top:auto;display:flex;align-items:center;gap:9px;padding:18px 3px 0;border-top:1px solid #ffffff20}.user-dot,.avatar{width:38px;height:38px;flex-shrink:0;border-radius:12px;display:grid;place-items:center;background:#e4ecf8;color:#244a7b;font-weight:700}.user-info{min-width:0;flex:1}.user-info b{display:block;color:#fff;font-size:10px;overflow:hidden;text-overflow:ellipsis}.user-info span{font-size:10px;color:#9aabc0}.main{flex:1;min-width:0;padding:30px clamp(18px,3vw,42px) 20px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:25px}.topbar h1{font:800 clamp(22px,2.3vw,29px) Manrope;margin:7px 0 0;letter-spacing:-.8px}.top-actions{display:flex;gap:9px}.primary,.secondary{border:0;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 15px;font-weight:700;font-size:12px;transition:.15s}.primary{background:#173b68;color:#fff;box-shadow:0 4px 10px #173b681c}.primary:hover{background:#204d83}.primary:disabled{opacity:.55;cursor:wait}.secondary{background:white;border:1px solid #e1e7f0;color:#394961}.secondary:hover{background:#f4f7fb}.compact{padding:8px 10px}.icon-button{display:grid;place-items:center;width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:inherit;font-size:22px}.icon-button:hover{background:#eaf0f7}.danger{color:#bd4a4a}.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}.stat-card{background:white;border:1px solid #e8edf4;border-radius:13px;padding:17px 18px;min-width:0;box-shadow:0 2px 8px #1a31500a}.stat-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;margin-bottom:14px}.blue{background:#e9f1ff;color:#3266ad}.green{background:#e5f7ef;color:#21845d}.amber{background:#fff3dc;color:#b47b1b}.purple{background:#f0eaff;color:#7657b6}.stat-card>span{display:block;font-size:11px;color:#68768b;font-weight:600}.stat-card strong{display:block;font:800 clamp(18px,1.8vw,23px) Manrope;margin:6px 0 5px;letter-spacing:-.7px;overflow-wrap:anywhere}.stat-card small{font-size:10px;color:#99a3b3}.workspace{display:grid;grid-template-columns:minmax(310px,.88fr) minmax(420px,1.45fr);gap:17px;align-items:stretch}.list-panel,.detail-panel{background:white;border:1px solid #e7ecf3;border-radius:14px;min-width:0;overflow:hidden;box-shadow:0 2px 8px #1a315008}.panel-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:21px 20px 15px}.panel-heading h2,.detail-title h2{font:800 17px Manrope;margin:0;letter-spacing:-.3px}.panel-heading p{font-size:11px;color:#8995a7;margin:5px 0 0}.pill{font-size:10px;font-weight:700;padding:6px 9px;border-radius:30px;background:#f0f3f8;color:#66748a;white-space:nowrap}.filters{display:flex;gap:8px;padding:0 16px 13px;border-bottom:1px solid #edf0f5}.searchbox{display:flex;align-items:center;gap:7px;border:1px solid #e1e7f0;border-radius:8px;padding:0 9px;flex:1;min-width:0;color:#9aa5b4}.searchbox input{border:0;outline:0;width:100%;min-width:0;padding:10px 0;font-size:11px}.filters select{width:125px;min-width:0;border:1px solid #e1e7f0;border-radius:8px;padding:0 7px;background:#fff;color:#54647b;font-size:10px}.student-list{max-height:650px;overflow-y:auto}.student-row{width:100%;border:0;border-bottom:1px solid #f0f2f6;background:#fff;padding:13px 16px;display:flex;align-items:center;gap:10px;text-align:left;color:inherit}.student-row:hover{background:#f8faff}.student-row.active{background:#edf4ff;box-shadow:inset 3px 0 #3569ad}.avatar{font-size:11px}.student-summary{flex:1;min-width:0}.student-summary>b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.student-summary>span{display:block;font-size:10px;color:#8290a3;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.row-meta{display:flex;align-items:center;gap:5px;margin-top:7px;font-size:9px;color:#6d7d92}.status-dot{width:6px;height:6px;border-radius:50%;background:#d6a34d}.row-money{text-align:right;min-width:68px}.row-money b{display:block;font-size:11px;color:#b17a20}.row-money span{font-size:9px;color:#9ca7b6}.detail-content{padding:20px}.detail-top{display:flex;align-items:center;gap:11px;padding-bottom:19px;border-bottom:1px solid #edf0f5}.avatar.large{width:49px;height:49px;border-radius:15px;font-size:14px}.detail-title{flex:1;min-width:0}.detail-title h2{overflow-wrap:anywhere}.status-badge{display:inline-block;margin-top:6px;background:#e9f2ff;color:#3566a7;border-radius:5px;padding:4px 7px;font-size:9px;font-weight:700}.contact-lines{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 20px;padding:18px 0}.contact-lines div span,.fee-summary span{display:block;color:#8b97a8;font-size:10px;margin-bottom:5px}.contact-lines div b{font-size:11px;overflow-wrap:anywhere}.fee-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:#f7f9fc;border:1px solid #edf0f5;border-radius:10px;padding:14px 12px;gap:8px}.fee-summary b{font:800 15px Manrope;overflow-wrap:anywhere}.green-text{color:#21845d}.amber-text{color:#b47b1b}.notes-box{margin-top:14px;padding:12px;background:#fbfcfe;border-radius:9px;border:1px solid #edf0f5;font-size:11px}.notes-box p{margin:6px 0 0;color:#69778a;white-space:pre-wrap}.section-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:23px 0 13px}.section-heading h3{font:800 14px Manrope;margin:0}.section-heading p{font-size:10px;color:#8b97a8;margin:4px 0 0}.payment-form{border:1px solid #e8edf4;border-radius:10px;padding:13px;background:#fcfdff}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 11px}.form-grid label,.login-card label{display:flex;flex-direction:column;gap:6px;font-size:10px;font-weight:700;color:#627087;min-width:0}.form-grid input,.form-grid select,.form-grid textarea,.login-card input{width:100%;min-width:0;border:1px solid #dfe6ef;background:white;border-radius:7px;padding:10px 9px;color:#24334a;font-size:11px;outline:0}.form-grid input:focus,.form-grid select:focus,.form-grid textarea:focus,.login-card input:focus{border-color:#7296c6;box-shadow:0 0 0 3px #edf4ff}.form-grid textarea{resize:vertical}.wide{grid-column:1/-1}.payment-form>.primary{margin-top:13px}.payment-list{margin-top:10px}.payment-row{display:flex;align-items:center;gap:10px;padding:12px 2px;border-bottom:1px solid #edf0f5}.payment-check{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:#e6f7ef;color:#23865f;flex-shrink:0}.payment-info{flex:1;min-width:0}.payment-info b{display:block;font-size:12px}.payment-info span,.payment-info small{display:block;color:#7f8da0;font-size:10px;margin-top:4px;overflow-wrap:anywhere}.receipt-link{display:flex;align-items:center;gap:5px;background:#f2f6fc;color:#365f94;border:0;border-radius:7px;padding:8px;font-size:10px;font-weight:700;flex-shrink:0}.form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:17px}.notice{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#eef6ff;color:#245486;border:1px solid #dcecff;padding:10px 13px;border-radius:8px;margin-bottom:15px;font-size:12px}.notice button{border:0;background:transparent;font-size:18px;color:inherit}.empty{min-height:170px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;text-align:center;padding:25px;color:#9aa6b5}.empty b{color:#596981;font-size:12px}.empty span,.empty p{font-size:11px;line-height:1.6;max-width:280px;margin:0}.detail-empty{min-height:490px}.detail-empty h2{font:800 17px Manrope;color:#526178;margin:4px 0 0}.empty-art{width:58px;height:58px;display:grid;place-items:center;border-radius:18px;background:#edf3fc;color:#416a9f}.empty .primary{margin-top:7px}.small-empty{min-height:80px;font-size:11px}.file-picked{font-size:10px;color:#27805c;font-weight:500}.login-shell,.center{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 15% 10%,#e5edf9,transparent 35%),#f5f7fb}.login-card{width:min(100%,390px);background:#fff;border:1px solid #e4eaf2;border-radius:18px;padding:30px;box-shadow:0 18px 60px #14284712}.login-card .brand-mark{margin-bottom:19px}.login-card h1{font:800 27px Manrope;margin:8px 0}.login-card .muted{font-size:12px;color:#8190a4;line-height:1.6;margin:0 0 24px}.login-card label{margin:14px 0}.login-card input{padding:12px;font-size:12px}.full{width:100%}.tiny{font-size:10px;color:#929eaf;line-height:1.6;text-align:center;margin:15px 0 0}.error{background:#fff0f0;color:#b33c3c;padding:10px;border-radius:7px;font-size:11px;margin:12px 0}.center{display:flex;flex-direction:column;gap:15px;color:#627087;font-size:12px}.center .login-card{color:#182338}.center .login-card p{font-size:12px;line-height:1.7}.spinner{width:25px;height:25px;border:3px solid #dce5f1;border-top-color:#315f97;border-radius:50%;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}footer{text-align:center;font-size:10px;color:#a0aaba;padding:20px 0 4px}
-@media(max-width:1120px){.workspace{grid-template-columns:minmax(280px,.85fr) minmax(350px,1.15fr)}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sidebar{width:205px}.main{padding:25px 20px}}@media(max-width:820px){.sidebar{width:66px;padding:20px 10px}.brand{padding:0 3px 30px}.brand>div:last-child,.nav-label,.nav-item:not(.selected){display:none}.brand-mark.small{width:40px}.nav-item{font-size:0;justify-content:center;padding:12px 0}.nav-count{display:none}.sidebar-bottom{flex-direction:column}.user-info{display:none}.workspace{grid-template-columns:1fr}.student-list{max-height:340px}.detail-empty{min-height:250px}}@media(max-width:560px){.main{padding:20px 12px}.topbar{align-items:flex-start;flex-direction:column}.top-actions{width:100%}.top-actions button{flex:1}.stats-grid{gap:9px}.stat-card{padding:13px}.stat-card strong{font-size:18px}.stat-card small{line-height:1.5}.filters{flex-direction:column}.filters select{width:100%;padding:10px}.contact-lines{grid-template-columns:1fr}.fee-summary{padding:12px 8px}.fee-summary b{font-size:12px}.detail-content{padding:15px}.form-grid{gap:12px 8px}.form-grid input,.form-grid select,.form-grid textarea{padding:9px 7px}.receipt-link{font-size:0}.receipt-link svg{width:17px;height:17px}.student-row{padding:12px 10px;gap:8px}.row-money{min-width:58px}.login-card{padding:24px}}
-''',
-"supabase-setup.sql": r'''-- Run this entire script in Supabase Dashboard → SQL Editor.
--- All rows are private to the authenticated user who created them.
-create extension if not exists pgcrypto;
+        .social-links a:hover {
+            background: var(--accent);
+            transform: translateY(-3px);
+        }
 
-create table if not exists public.students (
-  id uuid primary key default gen_random_uuid(),
-  owner_id uuid not null references auth.users(id) on delete cascade,
-  full_name text not null,
-  phone text,
-  email text,
-  country text default 'USA',
-  university text,
-  program text,
-  status text not null default 'New Lead',
-  total_fee numeric(12,2) not null default 0 check (total_fee >= 0),
-  notes text,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
+        /* Section Layout */
+        section {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--border-color);
+        }
 
-create table if not exists public.payments (
-  id uuid primary key default gen_random_uuid(),
-  owner_id uuid not null references auth.users(id) on delete cascade,
-  student_id uuid not null references public.students(id) on delete cascade,
-  amount numeric(12,2) not null check (amount > 0),
-  payment_date date not null default current_date,
-  method text not null default 'Bank Transfer',
-  reference text,
-  notes text,
-  receipt_path text,
-  created_at timestamptz not null default now()
-);
+        h2 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 0.75rem;
+        }
 
-create index if not exists students_owner_id_idx on public.students(owner_id);
-create index if not exists payments_owner_id_idx on public.payments(owner_id);
-create index if not exists payments_student_id_idx on public.payments(student_id);
+        h2 i {
+            color: var(--accent);
+        }
 
-alter table public.students enable row level security;
-alter table public.payments enable row level security;
+        /* About & Content Text */
+        .about-text {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+        }
 
-drop policy if exists "Owners can manage their students" on public.students;
-create policy "Owners can manage their students" on public.students
-  for all to authenticated using (auth.uid() = owner_id) with check (auth.uid() = owner_id);
+        /* Timeline / Experience Items */
+        .timeline-item {
+            position: relative;
+            padding-left: 1.5rem;
+            border-left: 2px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
 
-drop policy if exists "Owners can manage their payments" on public.payments;
-create policy "Owners can manage their payments" on public.payments
-  for all to authenticated using (auth.uid() = owner_id) with check (
-    auth.uid() = owner_id and exists (
-      select 1 from public.students s where s.id = student_id and s.owner_id = auth.uid()
-    )
-  );
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
 
--- Private storage bucket for screenshots/receipts. Files are not publicly accessible.
-insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('payment-receipts', 'payment-receipts', false, 10485760, array['image/png','image/jpeg','image/webp','application/pdf'])
-on conflict (id) do update set public = false, file_size_limit = 10485760,
-  allowed_mime_types = array['image/png','image/jpeg','image/webp','application/pdf'];
+        .timeline-item h3 {
+            font-size: 1.1rem;
+            color: var(--text-main);
+            font-weight: 600;
+        }
 
-drop policy if exists "Users can upload their own receipts" on storage.objects;
-create policy "Users can upload their own receipts" on storage.objects
-  for insert to authenticated with check (
-    bucket_id = 'payment-receipts' and (storage.foldername(name))[1] = auth.uid()::text
-  );
+        .timeline-item span {
+            font-size: 0.9rem;
+            color: var(--accent);
+            font-weight: 500;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
 
-drop policy if exists "Users can view their own receipts" on storage.objects;
-create policy "Users can view their own receipts" on storage.objects
-  for select to authenticated using (
-    bucket_id = 'payment-receipts' and (storage.foldername(name))[1] = auth.uid()::text
-  );
+        .timeline-item p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
 
-drop policy if exists "Users can delete their own receipts" on storage.objects;
-create policy "Users can delete their own receipts" on storage.objects
-  for delete to authenticated using (
-    bucket_id = 'payment-receipts' and (storage.foldername(name))[1] = auth.uid()::text
-  );
+        /* Skills Grid */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+        }
 
--- Optional updated_at trigger
-create or replace function public.set_updated_at()
-returns trigger language plpgsql as $$
-begin new.updated_at = now(); return new; end;
-$$;
-drop trigger if exists students_updated_at on public.students;
-create trigger students_updated_at before update on public.students
-for each row execute function public.set_updated_at();
-''',
-"README.md": r'''# Ibex Student CRM
+        .skill-category {
+            background: var(--bg-color);
+            padding: 1.25rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
 
-A responsive, login-protected student and payment CRM starter for Ibex Overseas Education. It uses **React + Vite** for the website and **Supabase** for authentication, a hosted PostgreSQL database, and private receipt uploads.
+        .skill-category h4 {
+            font-size: 1rem;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-## Features
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
 
-- Login with email/password (no public sign-up page)
-- Add, edit, search, filter, and delete student records
-- Track country, university, program, application status, contact information, service fee, and notes
-- Record multiple payments per student with date, method, transaction reference, and notes
-- Upload receipt screenshots or PDFs (max 10 MB each)
-- Dashboard totals for expected fees, recorded collections, and pending balances
-- Responsive layout for desktop and mobile
-- Row-level security: authenticated users only see rows they own; receipt bucket is private
+        .tag {
+            background: #ffffff;
+            color: var(--text-main);
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+        }
 
-## Important before using real student data
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
 
-This is a starter CRM, not a fully audited financial system. Configure and test access controls before adding real data. Do not store passport scans, passwords, bank logins, or other unnecessary sensitive documents here. Give access only to staff who need it, use strong unique passwords, enable MFA for the Supabase account, and maintain backups. If multiple staff need shared access to the same student records, the database design must be changed to use an organization/team membership model; this starter intentionally isolates each user's records.
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            header {
+                padding: 3rem 1rem;
+            }
+            header h1 {
+                font-size: 2rem;
+            }
+            section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
 
-## 1. Create your Supabase backend
+    <div class="container">
+        <!-- Header / Hero -->
+        <header>
+            <div class="profile-avatar">AH</div>
+            <h1>Aqeel Haider</h1>
+            <p>Engineer & Digital Communications Specialist building bridges between technical systems and digital strategy.</p>
+            <div class="social-links">
+                <a href="https://github.com/your-github-username" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://linkedin.com/in/your-linkedin-username" target="_blank" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="mailto:your.email@example.com" title="Email"><i class="fas fa-envelope"></i></a>
+            </div>
+        </header>
 
-1. Create a project at https://supabase.com.
-2. In the Supabase project, open **SQL Editor**, create a query, paste all of `supabase-setup.sql`, and run it.
-3. Open **Project Settings → API** (or **Connect**, depending on the dashboard version). Copy the Project URL and the **publishable/anon** client key.
-4. Open **Authentication → Users** and create your own user with your email and a strong password. Keep public sign-ups disabled. If you later need staff accounts, create them deliberately and review access requirements.
-5. In **Authentication → URL Configuration**, add your local URL during testing and your deployed website URL after deployment.
+        <!-- About Section -->
+        <section>
+            <h2><i class="fas fa-user"></i> About Me</h2>
+            <p class="about-text">
+                I hold a Bachelor's degree in Electronic Engineering and bring diverse professional experience spanning engineering principles, education, digital marketing strategy, and client communications. 
+            </p>
+            <p class="about-text">
+                Passionate about leveraging analytical thinking, technical problem-solving, and modern digital tools to drive meaningful impact and connect audiences with impactful educational and professional opportunities.
+            </p>
+        </section>
 
-## 2. Run locally
+        <!-- Experience Section -->
+        <section>
+            <h2><i class="fas fa-briefcase"></i> Experience & Background</h2>
+            
+            <div class="timeline-item">
+                <h3>Digital Marketing & Communications Specialist</h3>
+                <span>Ibex Overseas Education Services</span>
+                <p>Managing digital marketing campaigns, crafting audience-targeted social media content, designing corporate marketing materials, and overseeing client communications.</p>
+            </div>
 
-Install Node.js (LTS), then open a terminal in this folder:
+            <div class="timeline-item">
+                <h3>Educator — Mathematics & Computer Science</h3>
+                <span>High Aims Educators & Al Asar Academy</span>
+                <p>Taught Mathematics, Computer Science, and General Science, fostering analytical thinking and structured problem-solving skills in students.</p>
+            </div>
 
-```bash
-npm install
-cp .env.example .env
-```
+            <div class="timeline-item">
+                <h3>Digital Marketing Intern</h3>
+                <span>Digital Creative Agency</span>
+                <p>Executed SEO optimizations, produced targeted email marketing campaigns, and analyzed performance metrics (CTR, CPC, ROAS) to improve campaign efficiency.</p>
+            </div>
+        </section>
 
-On Windows PowerShell, use `Copy-Item .env.example .env` instead of `cp`.
+        <!-- Skills Section -->
+        <section>
+            <h2><i class="fas fa-tools"></i> Skills & Expertise</h2>
+            <div class="skills-grid">
+                <div class="skill-category">
+                    <h4><i class="fas fa-bullhorn text-accent"></i> Marketing & Strategy</h4>
+                    <div class="skill-tags">
+                        <span class="tag">SEO Optimization</span>
+                        <span class="tag">Email Campaigns</span>
+                        <span class="tag">Social Media Ads</span>
+                        <span class="tag">Audience Targeting</span>
+                        <span class="tag">Metrics & Analytics</span>
+                    </div>
+                </div>
 
-Edit `.env` and set:
+                <div class="skill-category">
+                    <h4><i class="fas fa-paint-brush text-accent"></i> Design & Tools</h4>
+                    <div class="skill-tags">
+                        <span class="tag">Canva</span>
+                        <span class="tag">Figma</span>
+                        <span class="tag">MS Word</span>
+                        <span class="tag">MS Excel</span>
+                        <span class="tag">MS PowerPoint</span>
+                    </div>
+                </div>
 
-```env
-VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY
-```
+                <div class="skill-category">
+                    <h4><i class="fas fa-graduation-cap text-accent"></i> Core & Education</h4>
+                    <div class="skill-tags">
+                        <span class="tag">Electronic Engineering</span>
+                        <span class="tag">Client Communications</span>
+                        <span class="tag">Content Writing</span>
+                        <span class="tag">Mathematics</span>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-Then run:
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2026 Aqeel Haider. Built with HTML & CSS for GitHub Pages.</p>
+        </footer>
+    </div>
 
-```bash
-npm run dev
-```
-
-Open the local URL Vite prints, usually `http://localhost:5173`.
-
-**Never use a Supabase service-role key in frontend code or commit your `.env` file to GitHub.** The public/anon key is designed for browser use only when Row Level Security policies are enabled correctly.
-
-## 3. Put the code on GitHub
-
-1. Create a new private GitHub repository, for example `ibex-student-crm`.
-2. Upload the project files, excluding `.env` and `node_modules`.
-3. In the repository settings, confirm `.env` is not tracked. If you accidentally committed credentials, rotate them.
-4. You can deploy the frontend on Vercel or Netlify (recommended for the simplest setup) and connect the GitHub repository. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` under the deployment project's environment variables.
-5. Add the final deployment URL to Supabase Authentication → URL Configuration, then redeploy if needed.
-
-GitHub Pages can host a static frontend, but it does not provide a database or secure login by itself. The Supabase backend is what makes the data available from anywhere after login.
-
-## 4. Test before entering real records
-
-- Log in and add a test student.
-- Add a test payment and upload a receipt.
-- Confirm pending balance decreases correctly.
-- Open the site in another browser/device and log in to verify records persist.
-- Try opening a receipt while logged out; it should not be publicly accessible.
-- If adding multiple staff, do not share one login. Decide whether staff should have separate, shared-team access before expanding.
-
-## Current scope / limitations
-
-- Currency is currently PKR; change the `money()` formatter in `src/main.jsx` if needed.
-- Payment totals use the amounts you manually record; this app does not connect to a bank or verify a transfer automatically.
-- It prevents public self-registration but does not yet provide an in-app admin user manager.
-- Deleting a student deletes their payment rows through the database relationship. It does not automatically delete old receipt files from storage, so periodically review storage usage or add a cleanup function.
-- This version is for a single owner per record. A team CRM with role-based permissions, audit logs, exports, reminders, and multi-user shared records should be a planned next iteration.
-'''
-}
-for rel, content in files.items():
-    path = os.path.join(base, rel)
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(content)
-
-zip_path = "/mnt/data/ibex-student-crm.zip"
-with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
-    for root, dirs, filenames in os.walk(base):
-        for fn in filenames:
-            full = os.path.join(root, fn)
-            z.write(full, os.path.relpath(full, base))
-print(f"Created project with {len(files)} files: {zip_path}")
+</body>
+</html>
