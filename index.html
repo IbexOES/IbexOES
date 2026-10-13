@@ -6,11 +6,6 @@
     <title>Global Student Payment Management Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
     <style>
         :root {
             --primary: #1e3a8a;
@@ -222,7 +217,7 @@
             width: auto;
         }
 
-        /* Modal / Installment Management Window */
+        /* Modal Window */
         .modal {
             display: none;
             position: fixed;
@@ -304,7 +299,7 @@
         <!-- DASHBOARD SCREEN -->
         <div id="dashboard-screen">
             <header>
-                <h1><i class="fas fa-graduation-cap"></i> Global Student Records (Cloud Synced)</h1>
+                <h1><i class="fas fa-globe"></i> Global Cloud Student Portal</h1>
                 <button class="logout-btn" onclick="handleLogout()">Logout</button>
             </header>
 
@@ -364,7 +359,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="student-table-body">
-                                    <tr><td colspan="6" class="loading-spinner">Connecting to cloud database...</td></tr>
+                                    <tr><td colspan="6" class="loading-spinner">Connecting to cloud storage...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -401,7 +396,7 @@
 
             <!-- Full Edit Form -->
             <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 1rem;"><i class="fas fa-edit"></i> Edit Record Details</h4>
-            <input type="hidden" id="edit-student-doc-id">
+            <input type="hidden" id="edit-student-id">
             
             <div class="form-group">
                 <label>Total Package Amount ($)</label>
@@ -425,25 +420,14 @@
     </div>
 
     <script>
-        // ==========================================
-        // FIREBASE CLOUD CONFIGURATION
-        // ==========================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyD-YOUR-FIREBASE-API-KEY-HERE",
-            authDomain: "your-project-id.firebaseapp.com",
-            projectId: "your-project-id",
-            storageBucket: "your-project-id.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:123456:web:abcdef"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        // ========================================================
+        // JSONBIN.IO CONFIGURATION (PUT YOUR KEYS HERE)
+        // ========================================================
+        const JSONBIN_BIN_ID = "YOUR_BIN_ID_HERE";       // e.g. "650a..."
+        const JSONBIN_API_KEY = "YOUR_MASTER_KEY_HERE";   // e.g. "$2a$10$..."
 
         const CORRECT_CODE = "51214";
         let studentsCache = [];
-        let unsubscribeLiveSync = null;
 
         window.onload = function() {
             if(sessionStorage.getItem("isLoggedIn") === "true") {
@@ -465,7 +449,6 @@
 
         function handleLogout() {
             sessionStorage.removeItem("isLoggedIn");
-            if(unsubscribeLiveSync) unsubscribeLiveSync(); // Stop real-time listener
             document.getElementById("dashboard-screen").style.display = "none";
             document.getElementById("login-screen").style.display = "block";
             document.getElementById("passcode-input").value = "";
@@ -474,27 +457,43 @@
         function showDashboard() {
             document.getElementById("login-screen").style.display = "none";
             document.getElementById("dashboard-screen").style.display = "block";
-            startRealtimeSync();
+            fetchStudentsFromCloud();
         }
 
-        // ==========================================
-        // REAL-TIME CLOUD SYNC FROM FIRESTORE
-        // ==========================================
-        function startRealtimeSync() {
-            unsubscribeLiveSync = db.collection("students").orderBy("createdAt", "desc")
-                .onSnapshot((snapshot) => {
-                    studentsCache = [];
-                    snapshot.forEach((doc) => {
-                        studentsCache.push({ docId: doc.id, ...doc.data() });
-                    });
-                    renderTable();
-                }, (error) => {
-                    console.error("Database sync error: ", error);
-                    document.getElementById("student-table-body").innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--danger);">Error connecting to database. Please check your Firebase settings in the code.</td></tr>`;
+        // Fetch Data from JSONBin Cloud
+        async function fetchStudentsFromCloud() {
+            try {
+                const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+                    headers: { 'X-Master-Key': JSONBIN_API_KEY }
                 });
+                const data = await response.json();
+                studentsCache = Array.isArray(data.record) ? data.record : [];
+                renderTable();
+            } catch (err) {
+                console.error("Error fetching from cloud:", err);
+                document.getElementById("student-table-body").innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--danger);">Failed to load cloud data. Check your JSONBin ID and Master Key.</td></tr>`;
+            }
         }
 
-        function addStudent(e) {
+        // Save Data to JSONBin Cloud
+        async function saveStudentsToCloud(updatedStudents) {
+            try {
+                await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_API_KEY
+                    },
+                    body: JSON.stringify(updatedStudents)
+                });
+                studentsCache = updatedStudents;
+                renderTable();
+            } catch (err) {
+                alert("Error saving to cloud: " + err.message);
+            }
+        }
+
+        async function addStudent(e) {
             e.preventDefault();
             const name = document.getElementById("name").value;
             const course = document.getElementById("course").value;
@@ -504,27 +503,26 @@
             const remarks = document.getElementById("remarks").value;
             const dateStr = new Date().toLocaleDateString();
 
-            db.collection("students").add({
-                name,
-                course,
-                total_package,
-                paid_amount: initial_payment,
-                status,
+            const newStudent = { 
+                id: Date.now(), 
+                name, 
+                course, 
+                total_package, 
+                paid_amount: initial_payment, 
+                status, 
                 remarks,
-                history: [{ date: dateStr, amount: initial_payment }],
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                document.getElementById("student-form").reset();
-            }).catch((error) => {
-                alert("Error adding student: " + error.message);
-            });
+                history: [{ date: dateStr, amount: initial_payment }]
+            };
+
+            const updated = [...studentsCache, newStudent];
+            await saveStudentsToCloud(updated);
+            document.getElementById("student-form").reset();
         }
 
-        function deleteStudent(docId) {
+        async function deleteStudent(id) {
             if(confirm("Are you sure you want to delete this student record globally?")) {
-                db.collection("students").doc(docId).delete().catch((error) => {
-                    alert("Error deleting record: " + error.message);
-                });
+                const updated = studentsCache.filter(s => s.id !== id);
+                await saveStudentsToCloud(updated);
             }
         }
 
@@ -552,8 +550,8 @@
                     <td><span class="badge ${badgeClass}">${s.status}</span></td>
                     <td>
                         <div class="btn-action-group">
-                            <button class="btn-edit" onclick="openModal('${s.docId}')"><i class="fas fa-coins"></i> Edit / Installment</button>
-                            <button class="btn-delete" onclick="deleteStudent('${s.docId}')"><i class="fas fa-trash"></i></button>
+                            <button class="btn-edit" onclick="openModal(${s.id})"><i class="fas fa-coins"></i> Edit / Installment</button>
+                            <button class="btn-delete" onclick="deleteStudent(${s.id})"><i class="fas fa-trash"></i></button>
                         </div>
                     </td>
                 `;
@@ -561,18 +559,17 @@
             });
         }
 
-        /* Modal Operations for Installments */
-        function openModal(docId) {
-            const student = studentsCache.find(s => s.docId === docId);
+        /* Modal Operations */
+        function openModal(id) {
+            const student = studentsCache.find(s => s.id === id);
             if(!student) return;
 
-            document.getElementById("edit-student-doc-id").value = student.docId;
+            document.getElementById("edit-student-id").value = student.id;
             document.getElementById("modal-student-name").innerText = `Manage: ${student.name}`;
             document.getElementById("edit-total-package").value = student.total_package;
             document.getElementById("edit-status").value = student.status;
             document.getElementById("edit-remarks").value = student.remarks || "";
 
-            // Load History
             const historyList = document.getElementById("payment-history-list");
             historyList.innerHTML = "";
 
@@ -593,10 +590,11 @@
         function closeModal() {
             document.getElementById("edit-modal").style.display = "none";
             document.getElementById("new-installment-amount").value = "";
+            fetchStudentsFromCloud(); // Refresh data on close
         }
 
-        function addInstallmentPayment() {
-            const docId = document.getElementById("edit-student-doc-id").value;
+        async function addInstallmentPayment() {
+            const studentId = parseInt(document.getElementById("edit-student-id").value);
             const amountInput = document.getElementById("new-installment-amount");
             const newAmount = parseFloat(amountInput.value);
 
@@ -605,45 +603,39 @@
                 return;
             }
 
-            const student = studentsCache.find(s => s.docId === docId);
-            if(student) {
-                const updatedPaid = student.paid_amount + newAmount;
-                const dateStr = new Date().toLocaleDateString();
-                const updatedHistory = student.history ? [...student.history, { date: dateStr, amount: newAmount }] : [{ date: dateStr, amount: newAmount }];
-                
-                let updatedStatus = student.status;
-                if(updatedPaid >= student.total_package) {
-                    updatedStatus = "Paid";
-                }
+            const updated = studentsCache.map(s => {
+                if(s.id === studentId) {
+                    const updatedPaid = s.paid_amount + newAmount;
+                    const dateStr = new Date().toLocaleDateString();
+                    const updatedHistory = s.history ? [...s.history, { date: dateStr, amount: newAmount }] : [{ date: dateStr, amount: newAmount }];
+                    let updatedStatus = s.status;
+                    if(updatedPaid >= s.total_package) updatedStatus = "Paid";
 
-                db.collection("students").doc(docId).update({
-                    paid_amount: updatedPaid,
-                    history: updatedHistory,
-                    status: updatedStatus
-                }).then(() => {
-                    amountInput.value = "";
-                    openModal(docId); // Refresh modal view
-                }).catch((error) => {
-                    alert("Error updating payment: " + error.message);
-                });
-            }
+                    return { ...s, paid_amount: updatedPaid, history: updatedHistory, status: updatedStatus };
+                }
+                return s;
+            });
+
+            await saveStudentsToCloud(updated);
+            openModal(studentId);
+            amountInput.value = "";
         }
 
-        function saveStudentEdits() {
-            const docId = document.getElementById("edit-student-doc-id").value;
+        async function saveStudentEdits() {
+            const studentId = parseInt(document.getElementById("edit-student-id").value);
             const total_package = parseFloat(document.getElementById("edit-total-package").value);
             const status = document.getElementById("edit-status").value;
             const remarks = document.getElementById("edit-remarks").value;
 
-            db.collection("students").doc(docId).update({
-                total_package,
-                status,
-                remarks
-            }).then(() => {
-                closeModal();
-            }).catch((error) => {
-                alert("Error updating record: " + error.message);
+            const updated = studentsCache.map(s => {
+                if(s.id === studentId) {
+                    return { ...s, total_package, status, remarks };
+                }
+                return s;
             });
+
+            await saveStudentsToCloud(updated);
+            closeModal();
         }
     </script>
 </body>
