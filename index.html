@@ -349,7 +349,7 @@
                             </div>
                             <div class="form-group">
                                 <label>3rd Installment ($)</label>
-                                <input type="number" id="third_install_sevis" value="0" placeholder="0">
+                                <input type="number" id="third_install" value="0" placeholder="0">
                             </div>
                             <div class="form-group">
                                 <label>SEVIS ($)</label>
@@ -435,39 +435,23 @@
             <div class="form-grid-2">
                 <div class="form-group">
                     <label>Acceptance 1</label>
-                    <select id="edit-acceptance_1">
-                        <option value="Pending">Pending</option>
-                        <option value="Done">Done</option>
-                        <option value="N/A">N/A</option>
-                    </select>
+                   <input type="text" id="edit-acceptance_1">
                 </div>
                 <div class="form-group">
                     <label>Acceptance 2</label>
-                    <select id="edit-acceptance_2">
-                        <option value="Pending">Pending</option>
-                        <option value="Done">Done</option>
-                        <option value="N/A">N/A</option>
-                    </select>
+                    <input type="text" id="edit-acceptance_2">
                 </div>
             </div>
 
             <div class="form-grid-2">
                 <div class="form-group">
                     <label>Bank Statement</label>
-                    <select id="edit-bank_statement">
-                        <option value="Pending">Pending</option>
-                        <option value="Done">Done</option>
-                        <option value="N/A">N/A</option>
-                    </select>
-                </div>
+                                       <input type="text" id="edit-bank_statement">
+                                       </div>
                 <div class="form-group">
                     <label>I-20</label>
-                    <select id="edit-i_20">
-                        <option value="Pending">Pending</option>
-                        <option value="Done">Done</option>
-                        <option value="N/A">N/A</option>
-                    </select>
-                </div>
+                    <input type="text" id="edit-i_20">
+                                      </div>
             </div>
 
             <div class="form-grid-2">
@@ -477,19 +461,19 @@
                 </div>
                 <div class="form-group">
                     <label>Appointment</label>
-                    <select id="edit-appointment">
-                        <option value="Pending">Pending</option>
-                        <option value="Done">Done</option>
-                        <option value="N/A">N/A</option>
-                    </select>
+                    <selectinput type="text" id="edit-appointment">
+                      
                 </div>
             </div>
 
             <div class="form-group">
-                <label>3rd Install SEVIS ($)</label>
-                <input type="number" id="edit-third_install_sevis">
+                <label>3rd Install ($)</label>
+                <input type="number" id="edit-third_initial_pay">
             </div>
-
+  <div class="form-group">
+                <label>SEVIS ($)</label>
+                <input type="text" id="edit-sevis">
+            </div>
             <div class="form-group">
                 <label>Remarks / Notes</label>
                 <textarea id="edit-remarks" rows="2"></textarea>
