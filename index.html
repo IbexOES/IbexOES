@@ -559,16 +559,16 @@
             const newStudent = {
                 id: Date.now(),
                 name: document.getElementById("name").value,
-                program: document.getElementById("program").value,
-                preferred_by: document.getElementById("preferred_by").value || "N/A",
+                program: document.getElementById("program").value || "",
+                preferred_by: document.getElementById("preferred_by").value || "",
                 total_package: parseFloat(document.getElementById("total_package").value) || 0,
                 initial_pay: parseFloat(document.getElementById("initial_pay").value) || 0,
-                acceptance_1: document.getElementById("acceptance_1").value,
-                acceptance_2: document.getElementById("acceptance_2").value,
-                bank_statement: document.getElementById("bank_statement").value,
-                i_20: document.getElementById("i_20").value,
+                acceptance_1: document.getElementById("acceptance_1").value || "",
+                acceptance_2: document.getElementById("acceptance_2").value || "",
+                bank_statement: document.getElementById("bank_statement").value || "",
+                i_20: document.getElementById("i_20").value || "",
                 second_initial_pay: parseFloat(document.getElementById("second_initial_pay").value) || 0,
-                appointment: document.getElementById("appointment").value,
+                appointment: document.getElementById("appointment").value || "",
                 third_instalment: parseFloat(document.getElementById("third_instalment").value) || 0,
                 sevis_remarks: document.getElementById("sevis_remarks").value || "",
                 remarks: document.getElementById("remarks").value || ""
@@ -608,16 +608,16 @@
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td><strong>${s.name}</strong><br><small style="color: #64748b;">${s.program}</small></td>
-                    <td>${s.preferred_by}</td>
+                    <td><small>${s.preferred_by || 'None'}</small></td>
                     <td>$${s.total_package}</td>
                     <td>$${s.initial_pay}</td>
                     <td><strong style="color: ${pending > 0 ? 'var(--danger)' : 'var(--success)'}">$${pending >= 0 ? pending : 0}</strong></td>
-                    <td>${getBadge(s.acceptance_1)}</td>
-                    <td>${getBadge(s.acceptance_2)}</td>
-                    <td>${getBadge(s.bank_statement)}</td>
-                    <td>${getBadge(s.i_20)}</td>
+                     <td><small>${s.acceptance_1 || 'None'}</small></td>
+                    <td><small>${s.acceptance_2 || 'None'}</small></td>
+                   <td><small>${s.bank_statement || 'None'}</small></td>
+                    <td><small>${s.i_20 || 'None'}</small></td>
                     <td>$${s.second_initial_pay}</td>
-                    <td>${getBadge(s.appointment)}</td>
+                     <td><small>${s.appointment || 'None'}</small></td>
                     <td>$${s.third_instalment}</td>
                     <td><small>${s.sevis_remarks || 'None'}</small></td>
                     <td><small>${s.remarks || 'None'}</small></td>
@@ -642,12 +642,12 @@
             document.getElementById("edit-preferred_by").value = student.preferred_by || "";
             document.getElementById("edit-total_package").value = student.total_package || 0;
             document.getElementById("edit-initial_pay").value = student.initial_pay || 0;
-            document.getElementById("edit-acceptance_1").value = student.acceptance_1 || "Pending";
-            document.getElementById("edit-acceptance_2").value = student.acceptance_2 || "N/A";
-            document.getElementById("edit-bank_statement").value = student.bank_statement || "Pending";
-            document.getElementById("edit-i_20").value = student.i_20 || "Pending";
+            document.getElementById("edit-acceptance_1").value = student.acceptance_1 || "";
+            document.getElementById("edit-acceptance_2").value = student.acceptance_2 || "";
+            document.getElementById("edit-bank_statement").value = student.bank_statement || "";
+            document.getElementById("edit-i_20").value = student.i_20 || "";
             document.getElementById("edit-second_initial_pay").value = student.second_initial_pay || 0;
-            document.getElementById("edit-appointment").value = student.appointment || "N/A";
+            document.getElementById("edit-appointment").value = student.appointment || "";
             document.getElementById("edit-third_instalment").value = student.third_instalment || 0;
             document.getElementById("edit-sevis_remarks").value = student.sevis_remarks || "";
             document.getElementById("edit-remarks").value = student.remarks || "";
