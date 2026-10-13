@@ -421,10 +421,10 @@
 
     <script>
         // ========================================================
-        // JSONBIN.IO CONFIGURATION (PUT YOUR KEYS HERE)
+        // YOUR JSONBIN.IO CONFIGURATION
         // ========================================================
-        const JSONBIN_BIN_ID = "YOUR_BIN_ID_HERE";       // e.g. "650a..."
-        const JSONBIN_API_KEY = "YOUR_MASTER_KEY_HERE";   // e.g. "$2a$10$..."
+        const JSONBIN_BIN_ID = "6ace2f11ac6210605a2da73f";
+        const JSONBIN_API_KEY = "$2a$10$8cB1mLPEgn1Dtm/d.bTbbu/7urXUJ9VnLJfP1fWxFZXR2INglNptW";
 
         const CORRECT_CODE = "51214";
         let studentsCache = [];
@@ -471,7 +471,7 @@
                 renderTable();
             } catch (err) {
                 console.error("Error fetching from cloud:", err);
-                document.getElementById("student-table-body").innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--danger);">Failed to load cloud data. Check your JSONBin ID and Master Key.</td></tr>`;
+                document.getElementById("student-table-body").innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--danger);">Failed to load cloud data. Please check connection.</td></tr>`;
             }
         }
 
