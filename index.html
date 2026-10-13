@@ -3,537 +3,330 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student CRM & Fee Manager</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Aqeel Haider — Portfolio</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        :root {
+            --primary: #1e3a8a; /* Deep Navy Blue */
+            --secondary: #2563eb; /* Royal Blue */
+            --accent: #d97706; /* Soft Gold */
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Header / Hero Section */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #ffffff;
+            padding: 4rem 2rem;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.2);
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 auto 1.5rem auto;
+            border: 4px solid var(--accent);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.15rem;
+            color: #e2e8f0;
+            max-width: 600px;
+            margin: 0 auto 1.5rem auto;
+            font-weight: 300;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            background: rgba(255, 255, 255, 0.1);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #ffffff;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        /* Section Layout */
+        section {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 0.75rem;
+        }
+
+        h2 i {
+            color: var(--accent);
+        }
+
+        /* About & Content Text */
+        .about-text {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Timeline / Experience Items */
+        .timeline-item {
+            position: relative;
+            padding-left: 1.5rem;
+            border-left: 2px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-item h3 {
+            font-size: 1.1rem;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .timeline-item span {
+            font-size: 0.9rem;
+            color: var(--accent);
+            font-weight: 500;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-item p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        /* Skills Grid */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .skill-category {
+            background: var(--bg-color);
+            padding: 1.25rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .skill-category h4 {
+            font-size: 1rem;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            background: #ffffff;
+            color: var(--text-main);
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            header {
+                padding: 3rem 1rem;
+            }
+            header h1 {
+                font-size: 2rem;
+            }
+            section {
+                padding: 1.5rem;
+            }
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col">
+<body>
 
-    <!-- AUTHENTICATION VIEW (Hidden when logged in) -->
-    <div id="auth-screen" class="fixed inset-0 bg-gradient-to-br from-blue-900 via-indigo-900 to-slate-900 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 space-y-6">
-            <div class="text-center space-y-2">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-600 mb-2">
-                    <i class="fa-solid fa-graduation-cap text-2xl"></i>
-                </div>
-                <h1 class="text-2xl font-bold text-gray-900">Student CRM Portal</h1>
-                <p class="text-sm text-gray-500">Sign in to access your student database from anywhere</p>
-            </div>
-
-            <div id="auth-error" class="hidden bg-red-50 border-l-4 border-red-500 p-3 text-sm text-red-700"></div>
-
-            <form id="login-form" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Email Address</label>
-                    <input type="email" id="login-email" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="admin@example.com">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Password</label>
-                    <input type="password" id="login-password" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="••••••••">
-                </div>
-                <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200 text-sm">
-                    Sign In Securely
-                </button>
-            </form>
-            <div class="text-center pt-2 border-t border-gray-100">
-                <p class="text-xs text-gray-400">Protected by Firebase Cloud Security</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- MAIN CRM DASHBOARD (Hidden until logged in) -->
-    <div id="app-screen" class="hidden flex-1 flex flex-col">
-        <!-- Navigation Header -->
-        <header class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-lg">
-                        <i class="fa-solid fa-users-rectangle"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-bold text-gray-900 text-lg leading-tight">Student & Fee CRM</h1>
-                        <p class="text-xs text-gray-500">Global Management Dashboard</p>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span id="user-email-display" class="text-xs font-medium text-gray-600 hidden sm:inline"></span>
-                    <button id="logout-btn" class="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                        <span>Logout</span>
-                    </button>
-                </div>
+    <div class="container">
+        <!-- Header / Hero -->
+        <header>
+            <div class="profile-avatar">AH</div>
+            <h1>Aqeel Haider</h1>
+            <p>Engineer & Digital Communications Specialist building bridges between technical systems and digital strategy.</p>
+            <div class="social-links">
+                <a href="https://github.com/your-github-username" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://linkedin.com/in/your-linkedin-username" target="_blank" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="mailto:your.email@example.com" title="Email"><i class="fas fa-envelope"></i></a>
             </div>
         </header>
 
-        <!-- Main Content Area -->
-        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        <!-- About Section -->
+        <section>
+            <h2><i class="fas fa-user"></i> About Me</h2>
+            <p class="about-text">
+                I hold a Bachelor's degree in Electronic Engineering and bring diverse professional experience spanning engineering principles, education, digital marketing strategy, and client communications. 
+            </p>
+            <p class="about-text">
+                Passionate about leveraging analytical thinking, technical problem-solving, and modern digital tools to drive meaningful impact and connect audiences with impactful educational and professional opportunities.
+            </p>
+        </section>
+
+        <!-- Experience Section -->
+        <section>
+            <h2><i class="fas fa-briefcase"></i> Experience & Background</h2>
             
-            <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Total Students</p>
-                        <h3 id="stat-total-students" class="text-2xl font-bold text-gray-900 mt-1">0</h3>
-                    </div>
-                    <div class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-user-group"></i>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Active Students</p>
-                        <h3 id="stat-active-students" class="text-2xl font-bold text-emerald-600 mt-1">0</h3>
-                    </div>
-                    <div class="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-user-check"></i>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Total Collected</p>
-                        <h3 id="stat-total-collected" class="text-2xl font-bold text-blue-600 mt-1">$0</h3>
-                    </div>
-                    <div class="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-wallet"></i>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Total Pending Dues</p>
-                        <h3 id="stat-total-pending" class="text-2xl font-bold text-amber-600 mt-1">$0</h3>
-                    </div>
-                    <div class="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-clock-rotate-left"></i>
-                    </div>
-                </div>
+            <div class="timeline-item">
+                <h3>Digital Marketing & Communications Specialist</h3>
+                <span>Ibex Overseas Education Services</span>
+                <p>Managing digital marketing campaigns, crafting audience-targeted social media content, designing corporate marketing materials, and overseeing client communications.</p>
             </div>
 
-            <!-- Controls & Action Toolbar -->
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="w-full md:w-72 relative">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                        <i class="fa-solid fa-search"></i>
-                    </span>
-                    <input type="text" id="search-input" placeholder="Search by name or email..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                </div>
-                <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
-                    <select id="filter-status" class="px-3 py-2 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
-                        <option value="all">All Statuses</option>
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                        <option value="Pending Fee">Pending Fee</option>
-                    </select>
-                    <button id="open-add-modal-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-sm shadow transition flex items-center space-x-2 whitespace-nowrap">
-                        <i class="fa-solid fa-user-plus"></i>
-                        <span>Add New Student</span>
-                    </button>
-                </div>
+            <div class="timeline-item">
+                <h3>Educator — Mathematics & Computer Science</h3>
+                <span>High Aims Educators & Al Asar Academy</span>
+                <p>Taught Mathematics, Computer Science, and General Science, fostering analytical thinking and structured problem-solving skills in students.</p>
             </div>
 
-            <!-- Student Table / Data View -->
-            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 text-left">
-                        <thead class="bg-gray-50 text-gray-500 uppercase text-xs tracking-wider font-semibold">
-                            <tr>
-                                <th class="px-6 py-3">Student Name</th>
-                                <th class="px-6 py-3">Contact / Email</th>
-                                <th class="px-6 py-3">Status</th>
-                                <th class="px-6 py-3">Fee Paid ($)</th>
-                                <th class="px-6 py-3">Pending Dues ($)</th>
-                                <th class="px-6 py-3">Transaction Proof</th>
-                                <th class="px-6 py-3 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="students-table-body" class="divide-y divide-gray-200 text-sm text-gray-700 bg-white">
-                            <!-- Populated dynamically via JS -->
-                        </tbody>
-                    </table>
-                </div>
-                <!-- Empty State -->
-                <div id="empty-state" class="hidden text-center py-12">
-                    <div class="w-16 h-16 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
-                        <i class="fa-solid fa-folder-open"></i>
+            <div class="timeline-item">
+                <h3>Digital Marketing Intern</h3>
+                <span>Digital Creative Agency</span>
+                <p>Executed SEO optimizations, produced targeted email marketing campaigns, and analyzed performance metrics (CTR, CPC, ROAS) to improve campaign efficiency.</p>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section>
+            <h2><i class="fas fa-tools"></i> Skills & Expertise</h2>
+            <div class="skills-grid">
+                <div class="skill-category">
+                    <h4><i class="fas fa-bullhorn text-accent"></i> Marketing & Strategy</h4>
+                    <div class="skill-tags">
+                        <span class="tag">SEO Optimization</span>
+                        <span class="tag">Email Campaigns</span>
+                        <span class="tag">Social Media Ads</span>
+                        <span class="tag">Audience Targeting</span>
+                        <span class="tag">Metrics & Analytics</span>
                     </div>
-                    <p class="text-gray-500 font-medium">No student records found.</p>
-                    <p class="text-gray-400 text-xs mt-1">Click "Add New Student" to get started.</p>
+                </div>
+
+                <div class="skill-category">
+                    <h4><i class="fas fa-paint-brush text-accent"></i> Design & Tools</h4>
+                    <div class="skill-tags">
+                        <span class="tag">Canva</span>
+                        <span class="tag">Figma</span>
+                        <span class="tag">MS Word</span>
+                        <span class="tag">MS Excel</span>
+                        <span class="tag">MS PowerPoint</span>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h4><i class="fas fa-graduation-cap text-accent"></i> Core & Education</h4>
+                    <div class="skill-tags">
+                        <span class="tag">Electronic Engineering</span>
+                        <span class="tag">Client Communications</span>
+                        <span class="tag">Content Writing</span>
+                        <span class="tag">Mathematics</span>
+                    </div>
                 </div>
             </div>
-        </main>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2026 Aqeel Haider. Built with HTML & CSS for GitHub Pages.</p>
+        </footer>
     </div>
 
-    <!-- ADD / EDIT STUDENT MODAL -->
-    <div id="student-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 space-y-6 max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between pb-4 border-b border-gray-100">
-                <h3 id="modal-title" class="text-lg font-bold text-gray-900">Add New Student</h3>
-                <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
-            </div>
-
-            <form id="student-form" class="space-y-4">
-                <input type="hidden" id="student-id">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Full Name</label>
-                    <input type="text" id="student-name" required class="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="e.g. John Doe">
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Email</label>
-                        <input type="email" id="student-email" required class="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="john@example.com">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Phone / WhatsApp</label>
-                        <input type="text" id="student-phone" class="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="+1 234 567 890">
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Status</label>
-                        <select id="student-status" class="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                            <option value="Pending Fee">Pending Fee</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Fee Paid ($)</label>
-                        <input type="number" step="0.01" id="student-paid" value="0" class="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Pending Dues ($)</label>
-                        <input type="number" step="0.01" id="student-pending" value="0" class="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Transaction Screenshot / Receipt</label>
-                    <input type="file" id="student-screenshot" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                    <p class="text-xs text-gray-400 mt-1">Upload bank transfer receipt or payment screenshot (PNG, JPG)</p>
-                    <div id="current-screenshot-preview" class="mt-2 hidden">
-                        <a id="screenshot-link" href="#" target="_blank" class="text-xs text-blue-600 hover:underline flex items-center space-x-1">
-                            <i class="fa-solid fa-image"></i>
-                            <span>View existing uploaded receipt</span>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-end space-x-3 pt-4 border-t border-gray-100">
-                    <button type="button" id="cancel-modal-btn" class="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg text-sm hover:bg-gray-50">Cancel</button>
-                    <button type="submit" id="save-student-btn" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-sm shadow">Save Student</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- SCREENSHOT LIGHTBOX MODAL -->
-    <div id="lightbox-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="relative max-w-2xl w-full bg-white rounded-xl overflow-hidden p-4">
-            <div class="flex justify-between items-center pb-3 border-b mb-3">
-                <h4 class="font-bold text-gray-800">Transaction Receipt</h4>
-                <button id="close-lightbox" class="text-gray-500 hover:text-gray-800 text-xl font-bold">&times;</button>
-            </div>
-            <div class="flex justify-center">
-                <img id="lightbox-img" src="" alt="Transaction Screenshot" class="max-h-[70vh] object-contain rounded-lg border">
-            </div>
-        </div>
-    </div>
-
-    <!-- FIREBASE & APP LOGIC -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
-
-        // ==========================================
-        // REPLACE WITH YOUR FIREBASE CONFIGURATION
-        // ==========================================
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
-
-        // State variables
-        let studentsData = [];
-        let editingId = null;
-        let existingScreenshotUrl = "";
-
-        // DOM Elements
-        const authScreen = document.getElementById('auth-screen');
-        const appScreen = document.getElementById('app-screen');
-        const loginForm = document.getElementById('login-form');
-        const authError = document.getElementById('auth-error');
-        const logoutBtn = document.getElementById('logout-btn');
-        const userEmailDisplay = document.getElementById('user-email-display');
-
-        const studentModal = document.getElementById('student-modal');
-        const openAddModalBtn = document.getElementById('open-add-modal-btn');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const cancelModalBtn = document.getElementById('cancel-modal-btn');
-        const studentForm = document.getElementById('student-form');
-        const modalTitle = document.getElementById('modal-title');
-        const studentsTableBody = document.getElementById('students-table-body');
-        const emptyState = document.getElementById('empty-state');
-        const searchInput = document.getElementById('search-input');
-        const filterStatus = document.getElementById('filter-status');
-
-        const lightboxModal = document.getElementById('lightbox-modal');
-        const lightboxImg = document.getElementById('lightbox-img');
-        const closeLightbox = document.getElementById('close-lightbox');
-        const currentScreenshotPreview = document.getElementById('current-screenshot-preview');
-        const screenshotLink = document.getElementById('screenshot-link');
-
-        // Statistics Elements
-        const statTotalStudents = document.getElementById('stat-total-students');
-        const statActiveStudents = document.getElementById('stat-active-students');
-        const statTotalCollected = document.getElementById('stat-total-collected');
-        const statTotalPending = document.getElementById('stat-total-pending');
-
-        // Authentication State Listener
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                authScreen.classList.add('hidden');
-                appScreen.classList.remove('hidden');
-                userEmailDisplay.textContent = user.email;
-                loadStudentsRealtime();
-            } else {
-                authScreen.classList.remove('hidden');
-                appScreen.classList.add('hidden');
-            }
-        });
-
-        // Login Handler
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            authError.classList.add('hidden');
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                authError.textContent = error.message;
-                authError.classList.remove('hidden');
-            }
-        });
-
-        // Logout Handler
-        logoutBtn.addEventListener('click', () => {
-            signOut(auth);
-        });
-
-        // Modal Controls
-        openAddModalBtn.addEventListener('click', () => {
-            editingId = null;
-            existingScreenshotUrl = "";
-            modalTitle.textContent = "Add New Student";
-            studentForm.reset();
-            currentScreenshotPreview.classList.add('hidden');
-            studentModal.classList.remove('hidden');
-            studentModal.classList.add('flex');
-        });
-
-        function closeModal() {
-            studentModal.classList.add('hidden');
-            studentModal.classList.remove('flex');
-        }
-
-        closeModalBtn.addEventListener('click', closeModal);
-        cancelModalBtn.addEventListener('click', closeModal);
-
-        // Realtime Data Sync from Firestore
-        function loadStudentsRealtime() {
-            onSnapshot(collection(db, "students"), (snapshot) => {
-                studentsData = [];
-                snapshot.forEach((docSnap) => {
-                    studentsData.push({ id: docSnap.id, ...docSnap.data() });
-                });
-                renderStudents();
-                updateStatistics();
-            }, (error) => {
-                console.error("Error loading students: ", error);
-            });
-        }
-
-        // Render Table & Filters
-        function renderStudents() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const statusFilter = filterStatus.value;
-
-            const filtered = studentsData.filter(s => {
-                const matchesSearch = (s.name && s.name.toLowerCase().includes(searchTerm)) || 
-                                      (s.email && s.email.toLowerCase().includes(searchTerm));
-                const matchesStatus = statusFilter === 'all' || s.status === statusFilter;
-                return matchesSearch && matchesStatus;
-            });
-
-            studentsTableBody.innerHTML = '';
-            if (filtered.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            } else {
-                emptyState.classList.add('hidden');
-            }
-
-            filtered.forEach(student => {
-                let badgeColor = 'bg-gray-100 text-gray-800';
-                if (student.status === 'Active') badgeColor = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
-                else if (student.status === 'Inactive') badgeColor = 'bg-gray-100 text-gray-600 border border-gray-200';
-                else if (student.status === 'Pending Fee') badgeColor = 'bg-amber-50 text-amber-700 border border-amber-200';
-
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-gray-50 transition';
-                tr.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${escapeHtml(student.name)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-gray-500">
-                        <div>${escapeHtml(student.email)}</div>
-                        <div class="text-xs text-gray-400">${escapeHtml(student.phone || 'No phone')}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2.5 py-1 rounded-full text-xs font-medium ${badgeColor}">${escapeHtml(student.status)}</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap font-semibold text-emerald-600">$${Number(student.paid || 0).toFixed(2)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap font-semibold text-amber-600">$${Number(student.pending || 0).toFixed(2)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        ${student.screenshotUrl ? `<button onclick="window.openLightbox('${encodeURIComponent(student.screenshotUrl)}')" class="inline-flex items-center space-x-1 px-2.5 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 text-xs font-medium"><i class="fa-solid fa-image"></i><span>View Proof</span></button>` : `<span class="text-xs text-gray-400">No Receipt</span>`}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right space-x-2">
-                        <button onclick="window.editStudent('${student.id}')" class="text-blue-600 hover:text-blue-900 p-1" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="window.deleteStudent('${student.id}')" class="text-red-600 hover:text-red-900 p-1" title="Delete"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                `;
-                studentsTableBody.appendChild(tr);
-            });
-        }
-
-        // Update Dashboard Statistics
-        function updateStatistics() {
-            const total = studentsData.length;
-            const active = studentsData.filter(s => s.status === 'Active').length;
-            const totalCollected = studentsData.reduce((sum, s) => sum + Number(s.paid || 0), 0);
-            const totalPending = studentsData.reduce((sum, s) => sum + Number(s.pending || 0), 0);
-
-            statTotalStudents.textContent = total;
-            statActiveStudents.textContent = active;
-            statTotalCollected.textContent = `$${totalCollected.toFixed(2)}`;
-            statTotalPending.textContent = `$${totalPending.toFixed(2)}`;
-        }
-
-        // Save Student (Add / Update)
-        studentForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('student-name').value;
-            const email = document.getElementById('student-email').value;
-            const phone = document.getElementById('student-phone').value;
-            const status = document.getElementById('student-status').value;
-            const paid = parseFloat(document.getElementById('student-paid').value) || 0;
-            const pending = parseFloat(document.getElementById('student-pending').value) || 0;
-            const fileInput = document.getElementById('student-screenshot');
-
-            let screenshotUrl = existingScreenshotUrl;
-
-            const saveBtn = document.getElementById('save-student-btn');
-            saveBtn.disabled = true;
-            saveBtn.textContent = "Saving...";
-
-            try {
-                // If screenshot file is chosen, upload to Firebase Storage
-                if (fileInput.files && fileInput.files[0]) {
-                    const file = fileInput.files[0];
-                    const storageRef = ref(storage, `receipts/${Date.now()}_${file.name}`);
-                    const snapshot = await uploadBytes(storageRef, file);
-                    screenshotUrl = await getDownloadURL(snapshot.ref);
-                }
-
-                const studentPayload = { name, email, phone, status, paid, pending, screenshotUrl, updatedAt: new Date().toISOString() };
-
-                if (editingId) {
-                    await updateDoc(doc(db, "students", editingId), studentPayload);
-                } else {
-                    studentPayload.createdAt = new Date().toISOString();
-                    await addDoc(collection(db, "students"), studentPayload);
-                }
-
-                closeModal();
-            } catch (error) {
-                alert("Error saving student record: " + error.message);
-            } finally {
-                saveBtn.disabled = false;
-                saveBtn.textContent = "Save Student";
-            }
-        });
-
-        // Edit Student Global Function
-        window.editStudent = function(id) {
-            const student = studentsData.find(s => s.id === id);
-            if (!student) return;
-
-            editingId = id;
-            modalTitle.textContent = "Edit Student Details";
-            document.getElementById('student-name').value = student.name || '';
-            document.getElementById('student-email').value = student.email || '';
-            document.getElementById('student-phone').value = student.phone || '';
-            document.getElementById('student-status').value = student.status || 'Active';
-            document.getElementById('student-paid').value = student.paid || 0;
-            document.getElementById('student-pending').value = student.pending || 0;
-            
-            existingScreenshotUrl = student.screenshotUrl || '';
-            if (existingScreenshotUrl) {
-                screenshotLink.href = existingScreenshotUrl;
-                currentScreenshotPreview.classList.remove('hidden');
-            } else {
-                currentScreenshotPreview.classList.add('hidden');
-            }
-
-            studentModal.classList.remove('hidden');
-            studentModal.classList.add('flex');
-        };
-
-        // Delete Student Global Function
-        window.deleteStudent = async function(id) {
-            if (confirm("Are you sure you want to delete this student record?")) {
-                try {
-                    await deleteDoc(doc(db, "students", id));
-                } catch (error) {
-                    alert("Error deleting record: " + error.message);
-                }
-            }
-        };
-
-        // Lightbox Functions
-        window.openLightbox = function(url) {
-            lightboxImg.src = decodeURIComponent(url);
-            lightboxModal.classList.remove('hidden');
-            lightboxModal.classList.add('flex');
-        };
-
-        closeLightbox.addEventListener('click', () => {
-            lightboxModal.classList.add('hidden');
-            lightboxModal.classList.remove('flex');
-        });
-
-        // Search & Filter Event Listeners
-        searchInput.addEventListener('input', renderStudents);
-        filterStatus.addEventListener('change', renderStudents);
-
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#039;');
-        }
-    </script>
 </body>
 </html>
