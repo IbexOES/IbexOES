@@ -34,7 +34,7 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1450px;
             margin: 0 auto;
         }
 
@@ -56,7 +56,7 @@
         }
 
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 0.9rem;
             text-align: left;
         }
 
@@ -65,12 +65,12 @@
             font-size: 0.8rem;
             font-weight: 600;
             color: var(--text-muted);
-            margin-bottom: 0.35rem;
+            margin-bottom: 0.3rem;
         }
 
         input, select, textarea {
             width: 100%;
-            padding: 0.6rem;
+            padding: 0.55rem;
             border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 0.9rem;
@@ -368,11 +368,15 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>3rd Install SEVIS ($)</label>
-                                <input type="number" id="third_install_sevis" value="0" placeholder="0">
+                                <label>3rd Instalment ($)</label>
+                                <input type="number" id="third_instalment" value="0" placeholder="0">
                             </div>
                             <div class="form-group">
-                                <label>Remarks / Notes</label>
+                                <label>SEVIS (Remarks / Notes)</label>
+                                <input type="text" id="sevis_remarks" placeholder="SEVIS details or remarks">
+                            </div>
+                            <div class="form-group">
+                                <label>General Remarks / Notes</label>
                                 <textarea id="remarks" rows="2" placeholder="Notes..."></textarea>
                             </div>
                             <button type="submit">Save Student Record</button>
@@ -399,13 +403,14 @@
                                         <th>I-20</th>
                                         <th>2nd Init Pay</th>
                                         <th>Appt.</th>
-                                        <th>3rd SEVIS</th>
-                                        <th>Remarks</th>
+                                        <th>3rd Inst.</th>
+                                        <th>SEVIS Remarks</th>
+                                        <th>General Remarks</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="student-table-body">
-                                    <tr><td colspan="14" class="loading-spinner">Connecting to cloud storage...</td></tr>
+                                    <tr><td colspan="15" class="loading-spinner">Connecting to cloud storage...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -500,13 +505,19 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>3rd Install SEVIS ($)</label>
-                <input type="number" id="edit-third_install_sevis">
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label>3rd Instalment ($)</label>
+                    <input type="number" id="edit-third_instalment">
+                </div>
+                <div class="form-group">
+                    <label>SEVIS (Remarks / Notes)</label>
+                    <input type="text" id="edit-sevis_remarks">
+                </div>
             </div>
 
             <div class="form-group">
-                <label>Remarks / Notes</label>
+                <label>General Remarks / Notes</label>
                 <textarea id="edit-remarks" rows="2"></textarea>
             </div>
 
@@ -562,7 +573,7 @@
                 renderTable();
             } catch (err) {
                 console.error("Error fetching from cloud:", err);
-                document.getElementById("student-table-body").innerHTML = `<tr><td colspan="14" style="text-align: center; color: var(--danger);">Failed to load cloud data.</td></tr>`;
+                document.getElementById("student-table-body").innerHTML = `<tr><td colspan="15" style="text-align: center; color: var(--danger);">Failed to load cloud data.</td></tr>`;
             }
         }
 
@@ -598,7 +609,8 @@
                 i_20: document.getElementById("i_20").value,
                 second_initial_pay: parseFloat(document.getElementById("second_initial_pay").value) || 0,
                 appointment: document.getElementById("appointment").value,
-                third_install_sevis: parseFloat(document.getElementById("third_install_sevis").value) || 0,
+                third_instalment: parseFloat(document.getElementById("third_instalment").value) || 0,
+                sevis_remarks: document.getElementById("sevis_remarks").value || "",
                 remarks: document.getElementById("remarks").value || ""
             };
 
@@ -625,12 +637,12 @@
             tbody.innerHTML = "";
 
             if(studentsCache.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="14" style="text-align: center; color: #64748b;">No student records found in cloud.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="15" style="text-align: center; color: #64748b;">No student records found in cloud.</td></tr>`;
                 return;
             }
 
             studentsCache.forEach(s => {
-                const totalPaid = (parseFloat(s.initial_pay) || 0) + (parseFloat(s.second_initial_pay) || 0) + (parseFloat(s.third_install_sevis) || 0);
+                const totalPaid = (parseFloat(s.initial_pay) || 0) + (parseFloat(s.second_initial_pay) || 0) + (parseFloat(s.third_instalment) || 0);
                 const pending = (parseFloat(s.total_package) || 0) - totalPaid;
 
                 const row = document.createElement("tr");
@@ -646,7 +658,8 @@
                     <td>${getBadge(s.i_20)}</td>
                     <td>$${s.second_initial_pay}</td>
                     <td>${getBadge(s.appointment)}</td>
-                    <td>$${s.third_install_sevis}</td>
+                    <td>$${s.third_instalment}</td>
+                    <td><small>${s.sevis_remarks || 'None'}</small></td>
                     <td><small>${s.remarks || 'None'}</small></td>
                     <td>
                         <div class="btn-action-group">
@@ -675,7 +688,8 @@
             document.getElementById("edit-i_20").value = student.i_20 || "Pending";
             document.getElementById("edit-second_initial_pay").value = student.second_initial_pay || 0;
             document.getElementById("edit-appointment").value = student.appointment || "N/A";
-            document.getElementById("edit-third_install_sevis").value = student.third_install_sevis || 0;
+            document.getElementById("edit-third_instalment").value = student.third_instalment || 0;
+            document.getElementById("edit-sevis_remarks").value = student.sevis_remarks || "";
             document.getElementById("edit-remarks").value = student.remarks || "";
 
             document.getElementById("edit-modal").style.display = "flex";
@@ -703,7 +717,8 @@
                         i_20: document.getElementById("edit-i_20").value,
                         second_initial_pay: parseFloat(document.getElementById("edit-second_initial_pay").value) || 0,
                         appointment: document.getElementById("edit-appointment").value,
-                        third_install_sevis: parseFloat(document.getElementById("edit-third_install_sevis").value) || 0,
+                        third_instalment: parseFloat(document.getElementById("edit-third_instalment").value) || 0,
+                        sevis_remarks: document.getElementById("edit-sevis_remarks").value,
                         remarks: document.getElementById("edit-remarks").value
                     };
                 }
