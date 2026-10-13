@@ -283,7 +283,7 @@
         <div id="login-screen">
             <h2><i class="fas fa-lock"></i> Portal Login</h2>
             <div class="form-group">
-                <label>Enter Security Code</label>
+                <label>Enter Security Code (51214)</label>
                 <input type="password" id="passcode-input" placeholder="Enter code..." />
             </div>
             <button onclick="handleLogin()">Access Dashboard</button>
@@ -423,7 +423,7 @@
         };
 
         function handleLogin() {
-            const inputVal = document.getElementById("passcode-input").value;
+            const inputVal = document.getElementById("passcode-input").value.trim();
             const errorMsg = document.getElementById("login-error");
 
             if(inputVal === CORRECT_CODE) {
@@ -503,3 +503,114 @@
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #64748b;">No student records found. Add one using the form.</td></tr>`;
                 return;
             }
+
+            students.forEach(s => {
+                const pending = s.total_package - s.paid_amount;
+                let badgeClass = "badge-pending";
+                if(s.status === "Paid") badgeClass = "badge-paid";
+                if(s.status === "Overdue") badgeClass = "badge-overdue";
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><strong>${s.name}</strong><br><small style="color: #64748b;">${s.course}</small></td>
+                    <td>$${s.total_package}</td>
+                    <td>$${s.paid_amount}</td>
+                    <td><strong style="color: ${pending > 0 ? 'var(--danger)' : 'var(--success)'}">$${pending >= 0 ? pending : 0}</strong></td>
+                    <td><span class="badge ${badgeClass}">${s.status}</span></td>
+                    <td>
+                        <div class="btn-action-group">
+                            <button class="btn-edit" onclick="openModal(${s.id})"><i class="fas fa-coins"></i> Edit / Installment</button>
+                            <button class="btn-delete" onclick="deleteStudent(${s.id})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        /* Modal Operations for Installments */
+        function openModal(id) {
+            const students = getStudents();
+            const student = students.find(s => s.id === id);
+
+            if(!student) return;
+
+            document.getElementById("edit-student-id").value = student.id;
+            document.getElementById("modal-student-name").innerText = `Manage: ${student.name}`;
+            document.getElementById("edit-total-package").value = student.total_package;
+            document.getElementById("edit-status").value = student.status;
+            document.getElementById("edit-remarks").value = student.remarks || "";
+
+            // Load History
+            const historyList = document.getElementById("payment-history-list");
+            historyList.innerHTML = "";
+
+            if(!student.history || student.history.length === 0) {
+                historyList.innerHTML = `<div style="text-align:center; color:#64748b; font-size:0.85rem;">No payment history recorded yet.</div>`;
+            } else {
+                student.history.forEach((h, index) => {
+                    const item = document.createElement("div");
+                    item.className = "history-item";
+                    item.innerHTML = `<span>Installment ${index + 1} (${h.date})</span> <strong>+$${h.amount}</strong>`;
+                    historyList.appendChild(item);
+                });
+            }
+
+            document.getElementById("edit-modal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("edit-modal").style.display = "none";
+            document.getElementById("new-installment-amount").value = "";
+        }
+
+        function addInstallmentPayment() {
+            const studentId = parseInt(document.getElementById("edit-student-id").value);
+            const amountInput = document.getElementById("new-installment-amount");
+            const newAmount = parseFloat(amountInput.value);
+
+            if(isNaN(newAmount) || newAmount <= 0) {
+                alert("Please enter a valid installment amount.");
+                return;
+            }
+
+            const students = getStudents();
+            const student = students.find(s => s.id === studentId);
+
+            if(student) {
+                student.paid_amount += newAmount;
+                if(!student.history) student.history = [];
+                
+                const dateStr = new Date().toLocaleDateString();
+                student.history.push({ date: dateStr, amount: newAmount });
+
+                // Auto update status if fully paid
+                if(student.paid_amount >= student.total_package) {
+                    student.status = "Paid";
+                }
+
+                saveStudents(students);
+                loadStudents();
+                openModal(studentId); // Reload modal history
+                amountInput.value = "";
+            }
+        }
+
+        function saveStudentEdits() {
+            const studentId = parseInt(document.getElementById("edit-student-id").value);
+            const students = getStudents();
+            const student = students.find(s => s.id === studentId);
+
+            if(student) {
+                student.total_package = parseFloat(document.getElementById("edit-total-package").value);
+                student.status = document.getElementById("edit-status").value;
+                student.remarks = document.getElementById("edit-remarks").value;
+
+                saveStudents(students);
+                loadStudents();
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
