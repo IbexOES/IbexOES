@@ -34,7 +34,7 @@
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
@@ -137,11 +137,11 @@
 
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 1fr 2fr;
+            grid-template-columns: 1fr 2.2fr;
             gap: 2rem;
         }
 
-        @media(max-width: 850px) {
+        @media(max-width: 900px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
@@ -198,16 +198,82 @@
         .badge-pending { background: #fef9c3; color: #a16207; }
         .badge-overdue { background: #fee2e2; color: var(--danger); }
 
-        .action-btn {
+        .btn-action-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-edit {
+            background: var(--secondary);
+            font-size: 0.8rem;
+            padding: 0.35rem 0.6rem;
+            width: auto;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            font-size: 0.8rem;
+            padding: 0.35rem 0.6rem;
+            width: auto;
+        }
+
+        /* Modal / Installment Management Window */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 550px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+        }
+
+        .close-modal {
             background: none;
             border: none;
-            color: var(--danger);
+            font-size: 1.5rem;
+            color: var(--text-muted);
             cursor: pointer;
-            font-size: 1rem;
             width: auto;
-            padding: 0;
         }
-        .action-btn:hover { color: #991b1b; background: none; }
+
+        .history-list {
+            margin-top: 1rem;
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 8px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            padding: 0.35rem 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
     </style>
 </head>
 <body>
@@ -250,20 +316,20 @@
                                 <input type="number" id="total_package" required placeholder="500">
                             </div>
                             <div class="form-group">
-                                <label>Installments Paid ($)</label>
-                                <input type="number" id="paid_amount" required placeholder="200">
+                                <label>Initial Installment Paid ($)</label>
+                                <input type="number" id="paid_amount" required placeholder="100">
                             </div>
                             <div class="form-group">
                                 <label>Status</label>
                                 <select id="status">
-                                    <option value="Paid">Fully Paid</option>
                                     <option value="Pending" selected>Pending Installments</option>
+                                    <option value="Paid">Fully Paid</option>
                                     <option value="Overdue">Overdue</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Remarks / Notes</label>
-                                <textarea id="remarks" rows="2" placeholder="Next payment due next month..."></textarea>
+                                <textarea id="remarks" rows="2" placeholder="Notes on payment..."></textarea>
                             </div>
                             <button type="submit">Save Student Record</button>
                         </form>
@@ -279,12 +345,11 @@
                                 <thead>
                                     <tr>
                                         <th>Name / Course</th>
-                                        <th>Package</th>
+                                        <th>Total</th>
                                         <th>Paid</th>
                                         <th>Pending</th>
                                         <th>Status</th>
-                                        <th>Remarks</th>
-                                        <th>Action</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="student-table-body">
@@ -298,10 +363,59 @@
         </div>
     </div>
 
+    <!-- INSTALLMENT & EDIT MODAL WINDOW -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-student-name">Manage Payments</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+
+            <!-- Add New Installment Section -->
+            <div style="background: #eff6ff; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid #bfdbfe;">
+                <h4 style="color: var(--primary); font-size: 0.95rem; margin-bottom: 0.5rem;"><i class="fas fa-plus-circle"></i> Add New Installment</h4>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="number" id="new-installment-amount" placeholder="Amount ($)" style="background: white;">
+                    <button onclick="addInstallmentPayment()" style="width: auto; white-space: nowrap; background: var(--success);">Add Payment</button>
+                </div>
+            </div>
+
+            <!-- Installments History Log -->
+            <h4 style="font-size: 0.9rem; color: var(--text-muted);"><i class="fas fa-history"></i> Payment History</h4>
+            <div class="history-list" id="payment-history-list">
+                <!-- History Items go here -->
+            </div>
+
+            <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid var(--border-color);">
+
+            <!-- Full Edit Form -->
+            <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 1rem;"><i class="fas fa-edit"></i> Edit Record Details</h4>
+            <input type="hidden" id="edit-student-id">
+            
+            <div class="form-group">
+                <label>Total Package Amount ($)</label>
+                <input type="number" id="edit-total-package">
+            </div>
+            <div class="form-group">
+                <label>Payment Status</label>
+                <select id="edit-status">
+                    <option value="Pending">Pending Installments</option>
+                    <option value="Paid">Fully Paid</option>
+                    <option value="Overdue">Overdue</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Remarks / Notes</label>
+                <textarea id="edit-remarks" rows="2"></textarea>
+            </div>
+
+            <button onclick="saveStudentEdits()">Update Student Record</button>
+        </div>
+    </div>
+
     <script>
         const CORRECT_CODE = "51214";
 
-        // Check if already logged in during this browser session
         window.onload = function() {
             if(sessionStorage.getItem("isLoggedIn") === "true") {
                 showDashboard();
@@ -333,7 +447,6 @@
             loadStudents();
         }
 
-        // Student Data Operations using localStorage
         function getStudents() {
             return JSON.parse(localStorage.getItem("github_students")) || [];
         }
@@ -347,12 +460,25 @@
             const name = document.getElementById("name").value;
             const course = document.getElementById("course").value;
             const total_package = parseFloat(document.getElementById("total_package").value);
-            const paid_amount = parseFloat(document.getElementById("paid_amount").value);
+            const initial_payment = parseFloat(document.getElementById("paid_amount").value);
             const status = document.getElementById("status").value;
             const remarks = document.getElementById("remarks").value;
 
+            const dateStr = new Date().toLocaleDateString();
+
+            const newStudent = { 
+                id: Date.now(), 
+                name, 
+                course, 
+                total_package, 
+                paid_amount: initial_payment, 
+                status, 
+                remarks,
+                history: [{ date: dateStr, amount: initial_payment }]
+            };
+
             const students = getStudents();
-            students.push({ id: Date.now(), name, course, total_package, paid_amount, status, remarks });
+            students.push(newStudent);
             
             saveStudents(students);
             document.getElementById("student-form").reset();
@@ -360,10 +486,12 @@
         }
 
         function deleteStudent(id) {
-            let students = getStudents();
-            students = students.filter(s => s.id !== id);
-            saveStudents(students);
-            loadStudents();
+            if(confirm("Are you sure you want to delete this student record?")) {
+                let students = getStudents();
+                students = students.filter(s => s.id !== id);
+                saveStudents(students);
+                loadStudents();
+            }
         }
 
         function loadStudents() {
@@ -372,29 +500,6 @@
             tbody.innerHTML = "";
 
             if(students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b;">No student records found. Add one using the form.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #64748b;">No student records found. Add one using the form.</td></tr>`;
                 return;
             }
-
-            students.forEach(s => {
-                const pending = s.total_package - s.paid_amount;
-                let badgeClass = "badge-pending";
-                if(s.status === "Paid") badgeClass = "badge-paid";
-                if(s.status === "Overdue") badgeClass = "badge-overdue";
-
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td><strong>${s.name}</strong><br><small style="color: #64748b;">${s.course}</small></td>
-                    <td>$${s.total_package}</td>
-                    <td>$${s.paid_amount}</td>
-                    <td><strong>$${pending >= 0 ? pending : 0}</strong></td>
-                    <td><span class="badge ${badgeClass}">${s.status}</span></td>
-                    <td><small>${s.remarks || 'None'}</small></td>
-                    <td><button class="action-btn" onclick="deleteStudent(${s.id})"><i class="fas fa-trash"></i></button></td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-    </script>
-</body>
-</html>
