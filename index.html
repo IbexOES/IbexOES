@@ -300,6 +300,10 @@
                         <h3>Add New Student</h3>
                         <form id="student-form" onsubmit="addStudent(event)">
                             <div class="form-group">
+    <label>Passport Number</label>
+    <input type="text" id="passport" placeholder="AB1234567">
+</div>
+                            <div class="form-group">
                                 <label>Student Name</label>
                                 <input type="text" id="name" required placeholder="John Doe">
                             </div>
@@ -369,9 +373,16 @@
                     <div class="card">
                         <h3>Registered Students & Status</h3>
                         <div class="table-responsive">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+    <h3>Registered Students & Status</h3>
+    <input type="text" id="search-input" onkeyup="renderTable()" placeholder="🔍 Search by name, passport, program..." style="max-width: 300px; padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px;">
+</div>
                             <table>
-                                <thead>
+                                <th>#</th>
+                                <th>Passport</th>
                                     <tr>
+                                        <th>Serial No.</th>
+                                        <th>Passport</th>
                                         <th>Student / Program</th>
                                         <th>Referred By</th>
                                         <th>Total Pkg</th>
@@ -559,6 +570,7 @@
             const newStudent = {
                 id: Date.now(),
                 name: document.getElementById("name").value,
+                passport: document.getElementById("passport") ? document.getElementById("passport").value || "N/A" : "N/A",
                 program: document.getElementById("program").value || "",
                 preferred_by: document.getElementById("preferred_by").value || "",
                 total_package: parseFloat(document.getElementById("total_package").value) || 0,
@@ -592,14 +604,44 @@
             return `<span class="badge badge-na">N/A</span>`;
         }
 
-        function renderTable() {
-            const tbody = document.getElementById("student-table-body");
-            tbody.innerHTML = "";
+    function renderTable() {
+    const tbody = document.getElementById("student-table-body");
+    const searchInput = document.getElementById("search-input");
+    const searchQuery = searchInput ? searchInput.value.toLowerCase() : "";
+    tbody.innerHTML = "";
 
-            if(studentsCache.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="15" style="text-align: center; color: #64748b;">No student records found in cloud.</td></tr>`;
-                return;
-            }
+    // Filter students based on search query (Name, Passport, Program, etc.)
+    const filteredStudents = studentsCache.filter(s => {
+        const name = (s.name || "").toLowerCase();
+        const passport = (s.passport || "").toLowerCase();
+        const program = (s.program || "").toLowerCase();
+        const preferred = (s.preferred_by || "").toLowerCase();
+        return name.includes(searchQuery) || passport.includes(searchQuery) || program.includes(searchQuery) || preferred.includes(searchQuery);
+    });
+
+    if(filteredStudents.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; color: #64748b;">No student records found.</td></tr>`;
+        return;
+    }
+
+    filteredStudents.forEach((s, index) => {
+        // Calculate pending / totals if applicable
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td><strong>${index + 1}</strong></td> <!-- Serial Number -->
+            <td><strong>${s.name}</strong><br><small style="color: #64748b;">${s.program}</small></td>
+            <td><code>${s.passport || 'N/A'}</code></td> <!-- Passport Column -->
+            <!-- ... Render your other customized table data (<td>) cells here ... -->
+            <td>
+                <div class="btn-action-group">
+                    <button class="btn-edit" onclick="openModal(${s.id})"><i class="fas fa-edit"></i> Edit</button>
+                    <button class="btn-delete" onclick="deleteStudent(${s.id})"><i class="fas fa-trash"></i></button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
 
             studentsCache.forEach(s => {
                 const totalPaid = (parseFloat(s.initial_pay) || 0) + (parseFloat(s.second_initial_pay) || 0) + (parseFloat(s.third_instalment) || 0);
@@ -636,6 +678,7 @@
             const student = studentsCache.find(s => s.id === id);
             if(!student) return;
 
+            document.getElementById("edit-passport").value = student.passport || "";
             document.getElementById("edit-student-id").value = student.id;
             document.getElementById("modal-student-name").innerText = `Edit: ${student.name}`;
             document.getElementById("edit-program").value = student.program || "";
@@ -667,6 +710,7 @@
                 if(s.id === studentId) {
                     return {
                         ...s,
+                        passport: document.getElementById("edit-passport").value,
                         program: document.getElementById("edit-program").value,
                         preferred_by: document.getElementById("edit-preferred_by").value,
                         total_package: parseFloat(document.getElementById("edit-total_package").value) || 0,
